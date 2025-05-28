@@ -1,0 +1,200 @@
+[
+    {
+        "name": "深圳湾1号",
+        "coordinates": [113.920, 22.550],
+        "status": "on-sale",
+        "price": "15万/㎡",
+        "area": "88-168㎡",
+        "totalPrice": "1320-2520万",
+        "url": "https://example.com/project1"
+    },
+    {
+        "name": "华润城",
+        "coordinates": [113.930, 22.550],
+        "status": "pending",
+        "price": "12万/㎡",
+        "area": "78-128㎡",
+        "totalPrice": "936-1536万",
+        "url": "https://example.com/project2"
+    },
+    {
+        "name": "招商蛇口",
+        "coordinates": [113.920, 22.540],
+        "status": "on-sale",
+        "price": "10万/㎡",
+        "area": "68-118㎡",
+        "totalPrice": "680-1180万",
+        "url": "https://example.com/project3"
+    },
+    {
+        "name": "万科云城",
+        "coordinates": [113.940, 22.550],
+        "status": "on-sale",
+        "price": "8万/㎡",
+        "area": "78-128㎡",
+        "totalPrice": "624-1024万",
+        "url": "https://example.com/project4"
+    },
+    {
+        "name": "保利天汇",
+        "coordinates": [113.930, 22.540],
+        "status": "pending",
+        "price": "9万/㎡",
+        "area": "88-138㎡",
+        "totalPrice": "792-1242万",
+        "url": "https://example.com/project5"
+    },
+    {
+        "name": "中海阅江府",
+        "coordinates": [113.950, 22.550],
+        "status": "on-sale",
+        "price": "7万/㎡",
+        "area": "68-108㎡",
+        "totalPrice": "476-756万",
+        "url": "https://example.com/project6"
+    },
+    {
+        "name": "龙光玖钻",
+        "coordinates": [113.940, 22.540],
+        "status": "on-sale",
+        "price": "6.5万/㎡",
+        "area": "78-118㎡",
+        "totalPrice": "507-767万",
+        "url": "https://example.com/project7"
+    },
+    {
+        "name": "恒大海上威尼斯",
+        "coordinates": [113.950, 22.540],
+        "status": "pending",
+        "price": "5.8万/㎡",
+        "area": "88-148㎡",
+        "totalPrice": "510-858万",
+        "url": "https://example.com/project8"
+    },
+    {
+        "name": "碧桂园十里银滩",
+        "coordinates": [113.918, 22.548],
+        "status": "on-sale",
+        "price": "11万/㎡",
+        "area": "98-168㎡",
+        "totalPrice": "1078-1848万",
+        "url": "https://example.com/project9"
+    },
+    {
+        "name": "融创南长安街壹号",
+        "coordinates": [113.928, 22.548],
+        "status": "on-sale",
+        "price": "13万/㎡",
+        "area": "108-188㎡",
+        "totalPrice": "1404-2444万",
+        "url": "https://example.com/project10"
+    },
+    {
+        "name": "绿地中心",
+        "coordinates": [113.938, 22.548],
+        "status": "pending",
+        "price": "9.5万/㎡",
+        "area": "78-128㎡",
+        "totalPrice": "741-1216万",
+        "url": "https://example.com/project11"
+    },
+    {
+        "name": "金地威新",
+        "coordinates": [113.948, 22.548],
+        "status": "on-sale",
+        "price": "7.8万/㎡",
+        "area": "68-118㎡",
+        "totalPrice": "530-920万",
+        "url": "https://example.com/project12"
+    },
+    {
+        "name": "华侨城天鹅堡",
+        "coordinates": [113.922, 22.542],
+        "status": "on-sale",
+        "price": "8.8万/㎡",
+        "area": "88-158㎡",
+        "totalPrice": "774-1390万",
+        "url": "https://example.com/project13"
+    },
+    {
+        "name": "星河丹堤",
+        "coordinates": [113.932, 22.542],
+        "status": "pending",
+        "price": "7.2万/㎡",
+        "area": "78-138㎡",
+        "totalPrice": "562-994万",
+        "url": "https://example.com/project14"
+    },
+    {
+        "name": "佳兆业城市广场",
+        "coordinates": [113.942, 22.542],
+        "status": "on-sale",
+        "price": "6.8万/㎡",
+        "area": "68-128㎡",
+        "totalPrice": "462-870万",
+        "url": "https://example.com/project15"
+    },
+    {
+        "name": "时代倾城",
+        "coordinates": [113.952, 22.542],
+        "status": "on-sale",
+        "price": "6.2万/㎡",
+        "area": "88-148㎡",
+        "totalPrice": "546-918万",
+        "url": "https://example.com/project16"
+    },
+    {
+        "name": "宝安中心壹号",
+        "coordinates": [113.828671, 22.754741],
+        "status": "on-sale",
+        "price": "8万/㎡",
+        "area": "88-128㎡",
+        "totalPrice": "704-1024万",
+        "url": "https://example.com/project1"
+    },
+    {
+        "name": "新安公馆",
+        "coordinates": [113.825, 22.752],
+        "status": "on-sale",
+        "price": "7.5万/㎡",
+        "area": "78-118㎡",
+        "totalPrice": "585-885万",
+        "url": "https://example.com/project2"
+    },
+    {
+        "name": "翻身花园",
+        "coordinates": [113.832, 22.757],
+        "status": "pending",
+        "price": "7万/㎡",
+        "area": "68-108㎡",
+        "totalPrice": "476-756万",
+        "url": "https://example.com/project3"
+    },
+    {
+        "name": "宝安湾",
+        "coordinates": [113.830, 22.750],
+        "status": "on-sale",
+        "price": "8.5万/㎡",
+        "area": "98-148㎡",
+        "totalPrice": "833-1258万",
+        "url": "https://example.com/project4"
+    },
+    {
+        "name": "新安雅苑",
+        "coordinates": [113.826, 22.756],
+        "status": "on-sale",
+        "price": "7.2万/㎡",
+        "area": "85-125㎡",
+        "totalPrice": "612-900万",
+        "url": "https://example.com/project5"
+    },
+    {
+        "name": "翻身新城",
+        "coordinates": [113.834, 22.753],
+        "status": "pending",
+        "price": "6.8万/㎡",
+        "area": "75-115㎡",
+        "totalPrice": "510-782万",
+        "url": "https://example.com/project6"
+    }
+] 
