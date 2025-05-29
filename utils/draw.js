@@ -8,7 +8,7 @@ let lastY = 0;
 
 // 画笔配置
 const DRAW_CONFIG = {
-    strokeStyle: '#FF6B6B',
+    strokeStyle: '#285FF5',
     lineWidth: 3,
     lineCap: 'round',
     lineJoin: 'round'
