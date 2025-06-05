@@ -87,17 +87,17 @@ function onZoomChange() {
         showBlocksOnly();
         hideProjectMarkers();
         console.log('显示模式：仅板块多边形');
-    } else if (currentZoom >= 11.5 && currentZoom < 14) {
+    } else if (currentZoom >= 11.5 && currentZoom < 13.2) {
         // 11.5-14级：显示板块名称 + 楼盘数量，隐藏新房点位
         showBlocksWithCount();
         hideProjectMarkers();
         console.log('显示模式：板块名称 + 楼盘数量');
-    } else if (currentZoom >= 14 && currentZoom <= 16.5) {
+    } else if (currentZoom >= 13.2 && currentZoom <= 16) {
         // 14-18级：显示板块名称 + 新房点位（多边形最大显示到18级）
         showBlocksSmall();
         showProjectMarkers();
         console.log('显示模式：板块名称 + 新房点位');
-    } else if (currentZoom > 16.5 && currentZoom <= 20) {
+    } else if (currentZoom > 16 && currentZoom <= 20) {
         // 18级以上：只显示新房点位，隐藏板块多边形和标签
         hideBlockPolygons(); // 新增函数：隐藏板块多边形
         hideBlockLabels();
