@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深圳购房服务平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 轮播图样式 */
+        .carousel-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .carousel-container {
+            position: relative;
+            height: 280px;
+            overflow: hidden;
+        }
+
+        .carousel-slide {
+            display: none;
+            padding: 50px 60px;
+            height: 100%;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .carousel-slide.active {
+            display: flex;
+        }
+
+        .slide-content {
+            flex: 1;
+            color: white;
+        }
+
+        .slide-title {
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: white;
+            margin-bottom: 25px;
+            line-height: 1.2;
+        }
+
+        .contact-info {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+
+        .contact-phone {
+            font-size: 1.4rem;
+            color: #fff;
+            font-weight: 600;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        .slide-image-container {
+            text-align: center;
+            margin-left: 40px;
+        }
+
+        .slide-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: rgba(255, 255, 255, 0.9);
+            transform: scale(1.2);
+        }
+
+        .dot:hover {
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 新房推荐样式 */
+        .section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .recommendation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .recommendation-item:hover {
+            border-color: #3498db;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* 定义渐变颜色序列 */
+        .recommendation-number {
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        /* 前6名使用特殊渐变颜色 */
+        .recommendation-item:nth-child(1) .recommendation-number {
+            background: linear-gradient(135deg, #ff4757 0%, #ff3838 100%);
+        }
+
+        .recommendation-item:nth-child(2) .recommendation-number {
+            background: linear-gradient(135deg, #fc7f60 0%, #f3482dea 100%);
+        }
+
+        .recommendation-item:nth-child(3) .recommendation-number {
+            background: linear-gradient(135deg, #f68953 0%, #ed650b 100%);
+        }
+
+        .recommendation-item:nth-child(4) .recommendation-number {
+            background: linear-gradient(135deg, #ff939e 0%, #ff7f8c 100%);
+        }
+
+        .recommendation-item:nth-child(5) .recommendation-number {
+            background: linear-gradient(135deg, #fa99c0 0%, #f34579 100%);
+        }
+
+        .recommendation-item:nth-child(6) .recommendation-number {
+            background: linear-gradient(135deg, #9ddf97 0%, #22da28 100%);
+        }
+
+        /* 第7名及以后使用蓝色渐变 */
+        .recommendation-item:nth-child(n+7) .recommendation-number {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .recommendation-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* 学区地图样式 */
+        .map-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .map-control-btn {
+            padding: 12px 24px;
+            background: #ecf0f1;
+            color: #2c3e50;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .map-control-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .map-control-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .district-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .district-btn {
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .district-btn:hover {
+            border-color: #3498db;
+            background: #e3f2fd;
+            transform: translateY(-2px);
+        }
+
+        /* 实用工具样式 */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .tool-btn {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .tool-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 新房数据 */
+        .property-data {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-container {
+                height: auto;
+                min-height: 320px;
+            }
+
+            .carousel-slide {
+                flex-direction: column;
+                text-align: center;
+                padding: 30px 20px;
+                height: auto;
+            }
+
+            .slide-content {
+                margin-bottom: 25px;
+            }
+
+            .slide-title {
+                font-size: 1.8rem;
+                margin-bottom: 15px;
+            }
+
+            .contact-info {
+                font-size: 1rem;
+            }
+
+            .contact-phone {
+                font-size: 1.2rem;
+                margin-top: 5px;
+            }
+
+            .slide-image-container {
+                margin-left: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px 0;
+            }
+
+            .slide-image {
+                width: 150px;
+                height: 150px;
+                object-fit: contain;
+            }
+
+            .carousel-dots {
+                position: static;
+                margin-top: 20px;
+                transform: none;
+            }
+
+            .district-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .map-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 轮播图部分 -->
+        <div class="carousel-section">
+            <div class="carousel-container">
+                <div class="carousel-slide active">
+                    <div class="slide-content">
+                        <h1 class="slide-title">深圳购房 1对1购房分析 专业分析 买房不踩坑</h1>
+                        <div class="contact-info">专业购房顾问为您服务</div>
+                        <div class="contact-phone"> &#9742; 150 1793 0126</div>
+                    </div>
+                    <div class="slide-image-container">
+                        <img src="weixin.jpg" alt="微信二维码" class="slide-image">
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <div class="slide-content">
+                        <h1 class="slide-title">购新房享额外折扣 佣金返现 买房更优惠</h1>
+                        <div class="contact-info">更多优惠等您来询</div>
+                        <div class="contact-phone"> &#9742; 150 1793 0126</div>
+                    </div>
+                    <div class="slide-image-container">
+                        <img src="weixin.jpg" alt="微信二维码" class="slide-image">
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <div class="slide-content">
+                        <h1 class="slide-title">看房专车接送 提前路线规划 看房更省心</h1>
+                        <div class="contact-info">贴心服务，安心看房</div>
+                        <div class="contact-phone"> &#9742; 150 1793 0126</div>
+                    </div>
+                    <div class="slide-image-container">
+                        <img src="weixin.jpg" alt="微信二维码" class="slide-image">
+                    </div>
+                </div>
+                <div class="carousel-dots">
+                    <span class="dot active" onclick="currentSlide(1)"></span>
+                    <span class="dot" onclick="currentSlide(2)"></span>
+                    <span class="dot" onclick="currentSlide(3)"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新房推荐部分 -->
+        <div class="section">
+            <h2 class="section-title">设置新盘查询</h2>
+            <div class="recommendation-grid" id="propertyGrid">
+                <!-- 新房数据将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 隐藏的新房数据 -->
+        <div class="property-data">
+            <div data-name="深圳新房项目(在售待售楼盘)" data-url="https://tan-0001.github.io/szxf/"></div>
+            <div data-name="深圳新房佣金(项目佣金查询)" data-url="https://example.com/project2"></div>
+            <div data-name="联系我们看房(&#9742;150 1793 0126)" data-url="https://example.com/project2"></div>
+        </div>
+
+        <!-- 学区地图部分 -->
+        <div class="section">
+            <h2 class="section-title">学区地图查询</h2>
+            <div class="map-controls">
+                <button class="map-control-btn active" onclick="switchMapType('primary')">小区学区地图</button>
+                <button class="map-control-btn" onclick="switchMapType('middle')">初中学区地图</button>
+                <button class="map-control-btn" onclick="switchMapType('lock')">学区锁定</button>
+            </div>
+            <div class="district-grid">
+                <a href="#" class="district-btn" data-district="futian">福田区</a>
+                <a href="#" class="district-btn" data-district="luohu">罗湖区</a>
+                <a href="#" class="district-btn" data-district="nanshan">南山区</a>
+                <a href="#" class="district-btn" data-district="yantian">盐田区</a>
+                <a href="#" class="district-btn" data-district="baoan">宝安区</a>
+                <a href="#" class="district-btn" data-district="longgang">龙岗区</a>
+                <a href="#" class="district-btn" data-district="longhua">龙华区</a>
+                <a href="#" class="district-btn" data-district="pingshan">坪山区</a>
+                <a href="#" class="district-btn" data-district="guangming">光明区</a>
+                <a href="#" class="district-btn" data-district="dapeng">大鹏新区</a>
+            </div>
+        </div>
+
+        <!-- 实用工具部分 -->
+        <div class="section">
+            <h2 class="section-title">实用工具</h2>
+            <div class="tools-grid">
+                <a href="https://mp.weixin.qq.com/s/qYTqH2ZElCRvTiZrGfOWsw" class="tool-btn">入学政策积分查询</a>
+                <a href="https://spatydz.sz.gov.cn/web/index.html#/" class="tool-btn">房源编码查询</a>
+                <a href="https://www.szpgzx.com/pgjcxApp/cx.jsp" class="tool-btn">房产评估系统</a>
+                <a href="https://zjj.sz.gov.cn:8004/" class="tool-btn">房地产信息系统</a>
+                <a href="https://www.fangdailixi.com/" class="tool-btn">房贷计算器</a>
+                <a href="https://sipub.sz.gov.cn/hspms/" class="tool-btn">社保查询</a>
+                <a href="https://www.metroman.cn/maps/shenzhen/network" class="tool-btn">深圳地铁线路图</a>
+                <a href="https://qh.sz.gov.cn/sygnan/xxgk/xxgkml/zcfg/zzwj/content/post_12160063.html" class="tool-btn">深圳国土空间规划</a>
+                <a href="http://pnr.sz.gov.cn/d-xgmap/index.html" class="tool-btn">深圳控规图</a>
+                <a href="https://pnr.sz.gov.cn/d-djtcx/djtcx/index.html" class="tool-btn">深圳地籍图</a>
+                <a href="https://www.szggzy.com/jygg/list.html?id=tdky" class="tool-btn">深圳土地交易</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 轮播图功能
+        let slideIndex = 1;
+        
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+        
+        function showSlides(n) {
+            let slides = document.getElementsByClassName("carousel-slide");
+            let dots = document.getElementsByClassName("dot");
+            
+            if (n > slides.length) {slideIndex = 1}
+            if (n < 1) {slideIndex = slides.length}
+            
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove("active");
+            }
+            
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].classList.remove("active");
+            }
+            
+            slides[slideIndex-1].classList.add("active");
+            dots[slideIndex-1].classList.add("active");
+        }
+        
+        // 自动轮播
+        function autoSlide() {
+            slideIndex++;
+            if (slideIndex > 3) slideIndex = 1;
+            showSlides(slideIndex);
+        }
+        
+        setInterval(autoSlide, 4000);
+
+        // 动态生成新房推荐列表
+        function generatePropertyList() {
+            const propertyData = document.querySelectorAll('.property-data > div');
+            const grid = document.getElementById('propertyGrid');
+            
+            propertyData.forEach((item, index) => {
+                const name = item.getAttribute('data-name');
+                const url = item.getAttribute('data-url');
+                const number = index + 1;
+                
+                const propertyItem = document.createElement('a');
+                propertyItem.href = url;
+                propertyItem.className = 'recommendation-item';
+                
+                propertyItem.innerHTML = `
+                    <div class="recommendation-number">${number}</div>
+                    <div class="recommendation-title">${name}</div>
+                `;
+                
+                grid.appendChild(propertyItem);
+            });
+        }
+
+        // 学区地图功能
+        const districtLinks = {
+            primary: {
+                futian: 'https://zs.szft.gov.cn/visitftgbxyxqdt',
+                luohu: 'https://zs.szlh.org.cn/visitlhgbxyxqdt',
+                nanshan: 'https://nszs.szns.gov.cn/visitnsgbxyxqdt',
+                yantian: 'https://www.yantian.gov.cn/cn/service/zdywly/xwsq/xyxwsq/ljxqhf/content/post_11345266.html',
+                baoan: 'https://www.baoan.gov.cn/jyj/zwgk/zdly/zsxx/content/post_11398657.html',
+                longgang: 'https://zsbm.lggov.cn/visitlggbxyxqdt',
+                longhua: 'https://zsjz.szlhq.gov.cn:8090/visitlhuagbxyxqdt',
+                pingshan: 'https://zsbm.szpsq.org.cn/visitpsgbxyxqdt',
+                guangming: 'https://zsxt.szgm.gov.cn:8443/visitgmgbxyxqdt',
+                dapeng: 'https://www.dpxq.gov.cn/zxfw/zdlyfw/xwsq/xxxwsq/content/mpost_3244238.html'
+            },
+            middle: {
+                futian: 'https://zs.szft.gov.cn/visitftgbcyxqdt',
+                luohu: 'https://zs.szlh.org.cn/visitlhgbcyxqdt',
+                nanshan: 'https://nszs.szns.gov.cn/visitnsgbcyxqdt',
+                yantian: 'https://www.yantian.gov.cn/cn/service/zdywly/xwsq/zyxwsq/ljxqhf/content/post_11345061.html',
+                baoan: 'https://www.baoan.gov.cn/jyj/zwgk/zdly/zsxx/content/post_11398657.html',
+                longgang: 'https://zsbm.lggov.cn/visitlggbcyxqdt',
+                longhua: 'https://zsjz.szlhq.gov.cn:8090/visitlhuagbcyxqdt',
+                pingshan: 'https://zsbm.szpsq.org.cn/visitpsgbcyxqdt',
+                guangming: 'https://zsxt.szgm.gov.cn:8443/visitgmgbcyxqdt',
+                dapeng: 'https://www.dpxq.gov.cn/zxfw/zdlyfw/xwsq/zxxwsq/content/post_3219374.html'
+            },
+            lock: {
+                futian: 'https://zs.szft.gov.cn/visitftgbxyxqfcx',
+                luohu: 'https://zs.szlh.org.cn/visitlhgbxyxqfcx',
+                nanshan: 'https://nszs.szns.gov.cn/visitnsgbxyxqfcx',
+                yantian: 'https://ytzs.yantian.org.cn/visitytgbxyxqfcx',
+                baoan: 'https://zs.baoan.edu.cn/visitbagbxyxqfcx',
+                longgang: 'https://zsbm.lggov.cn/visitlggbxyxqfcx',
+                longhua: 'https://zsjz.szlhq.gov.cn:8090/visitlhuagbxyxqfcx',
+                pingshan: 'https://zsbm.szpsq.org.cn/visitpsgbxyxqfcx',
+                guangming: 'https://zsxt.szgm.gov.cn:8443/visitgmgbxyxqfcx',
+                dapeng: 'https://zs.dpxq.gov.cn/visitdpgbxyxqfcx'
+            }
+        };
+
+        let currentMapType = 'primary';
+
+        function switchMapType(type) {
+            currentMapType = type;
+    
+    // 更新按钮状态
+            const buttons = document.querySelectorAll('.map-control-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+    
+    // 根据type找到对应的按钮并添加active类
+            if (type === 'primary') {
+                buttons[0].classList.add('active');
+            } else if (type === 'middle') {
+                buttons[1].classList.add('active');
+            } else if (type === 'lock') {
+                buttons[2].classList.add('active');
+            }
+            
+            // 更新区域链接
+            const districtBtns = document.querySelectorAll('.district-btn');
+            districtBtns.forEach(btn => {
+                const district = btn.getAttribute('data-district');
+                btn.href = districtLinks[type][district];
+            });
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            generatePropertyList();
+            switchMapType('primary');
+        });
+    </script>
+</body>
+</html>
