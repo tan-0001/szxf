@@ -47,8 +47,8 @@ function initMap() {
             zoomEnable: true,         // 启用缩放
             doubleClickZoom: true,    // 启用双击缩放
             dragEnable: true,         // 启用拖拽
-            pitchEnable: true,        // 启用俯仰角调节（3D模式关键配置）
-            rotateEnable: true        // 启用旋转（3D模式关键配置）
+            pitchEnable: false,        // 启用俯仰角调节（3D模式关键配置）
+            rotateEnable: false        // 启用旋转（3D模式关键配置）
         });
 
         console.log('3D地图对象创建成功');
