@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深圳代理项目佣金地图</title>
+    <link rel="stylesheet" href="yongjin.css">
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: '2f922f3dfca8c92a9b308bac7f3bd89d',
+        }
+    </script>
+    <!-- 高德地图API - 添加3D控制罗盘插件 -->
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=ae9e41fad1e95c52601814053f0ad510&plugin=AMap.Scale,AMap.ToolBar,AMap.InfoWindow,AMap.ControlBar"></script>
+</head>
+<body>
+    <!-- 地图容器 -->
+    <div id="map"></div>
+
+    <!-- 动画Logo水印 - 单个W型移动 -->
+    <div class="logo-watermark" id="logo-single">
+        <img src="logo.png" alt="臻选家">
+    </div>
+
+    <!-- 搜索栏 -->
+    <div id="search-bar">
+        <input type="text" id="search-input" placeholder="搜索代理项目..." />
+        <div id="search-results"></div>
+    </div>
+
+    <!-- 简化的工具栏 - 只保留购房服务按钮 -->
+    <div id="service-toolbar">
+        <button id="service-btn" onclick="window.location.href='newpage.html'" title="跳转介绍页">购房服务</button>
+    </div>
+
+    <!-- 加载脚本 -->
+    <script src="yongjin.js"></script>
+</body>
+</html>
