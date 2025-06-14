@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D新房可视化地图</title>
+    <link rel="stylesheet" href="3Dview.css">
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: '2f922f3dfca8c92a9b308bac7f3bd89d',
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/lines/Line2.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/lines/LineMaterial.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/lines/LineGeometry.js"></script>
+    <!-- 高德地图API - 添加3D控制罗盘插件 -->
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=ae9e41fad1e95c52601814053f0ad510&plugin=AMap.Scale,AMap.ToolBar,AMap.InfoWindow,AMap.ControlBar"></script>
+    <!-- Three.js 主库 (兼容版本) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- CSS2DRenderer (传统方式导入) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+    <!-- 高德地图Three.js图层插件 -->
+    <script src="https://cdn.jsdelivr.net/npm/@amap/three-layer/dist/index.js"></script>
+</head>
+<body>
+    <!-- 地图容器 -->
+    <div id="map"></div>
+
+    <!-- 动画Logo水印 - 单个W型移动 -->
+    <div class="logo-watermark" id="logo-single">
+        <img src="logo.png" alt="臻选家">
+    </div>
+
+    <!-- 画笔工具栏 -->
+    <div id="draw-toolbar">
+        <div class="toolbar-buttons">
+            <button id="start-draw">开启绘图</button>
+            <button id="clear-draw">清除绘图</button>
+        </div>
+        
+        <!-- 颜色选择面板 -->
+        <div id="color-panel" class="color-panel hidden">
+            <div class="color-option selected" data-color="#285FF5" style="background-color: #285FF5;" title="蓝色"></div>
+            <div class="color-option" data-color="#FF0000" style="background-color: #FF0000;" title="红色"></div>
+            <div class="color-option" data-color="#00FF00" style="background-color: #f4245c;" title="绿色"></div>
+            <div class="color-option" data-color="#000000" style="background-color: #252424;" title="黑色"></div>
+            <div class="color-option" data-color="#FFFF00" style="background-color: #30c66f;" title="黄色"></div>
+            <div class="color-option" data-color="#FF8C00" style="background-color: #FF8C00;" title="橙色"></div>
+            <div class="color-option" data-color="#8A2BE2" style="background-color: #8A2BE2;" title="紫色"></div>
+        </div>
+    </div>
+
+    <!-- Canvas 绘图层 -->
+    <canvas id="draw-canvas"></canvas>
+
+    <!-- 加载脚本 -->
+    <script src="utils/draw.js"></script>
+    <script src="3Dview.js"></script>
+</body>
+</html> 
