@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D新房可视化地图</title>
+    <link rel="stylesheet" href="3Dview.css">
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: '2f922f3dfca8c92a9b308bac7f3bd89d',
+        }
+    </script>
+    <!-- Three.js 主库 (兼容版本) -->
+    <script src="lib/three/three.min.js"></script>
+    <!-- Three.js 扩展库 -->
+    <script>
+        // 等待THREE加载完成后再加载扩展
+        function loadThreeExtensions() {
+            if (typeof THREE === 'undefined') {
+                setTimeout(loadThreeExtensions, 100);
+                return;
+            }
+            
+            // 按顺序加载Three.js扩展
+            const extensions = [
+                // 先加载基础组件
+                'lib/three/examples/js/lines/LineSegments2.js',
+                'lib/three/examples/js/lines/LineSegmentsGeometry.js',
+                // 再加载依赖组件
+                'lib/three/examples/js/lines/LineGeometry.js',
+                'lib/three/examples/js/lines/LineMaterial.js',
+                'lib/three/examples/js/lines/Line2.js',
+                // 最后加载渲染器
+                'lib/three/examples/js/lines/CSS2DRenderer.js'
+            ];
+            
+            function loadNext(index) {
+                if (index >= extensions.length) {
+                    console.log('All Three.js extensions loaded');
+                    // 确保CSS2DObject被正确初始化
+                    if (typeof THREE.CSS2DObject === 'undefined') {
+                        console.error('CSS2DObject not loaded properly');
+                        return;
+                    }
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = extensions[index];
+                script.onload = () => {
+                    console.log(`Loaded ${extensions[index]}`);
+                    // 如果是CSS2DRenderer，确保它被正确初始化
+                    if (extensions[index].includes('CSS2DRenderer')) {
+                        if (typeof THREE.CSS2DObject === 'undefined') {
+                            console.error('CSS2DObject not initialized after loading CSS2DRenderer');
+                        }
+                    }
+                    loadNext(index + 1);
+                };
+                script.onerror = (error) => {
+                    console.error(`Failed to load ${extensions[index]}:`, error);
+                    loadNext(index + 1);
+                };
+                document.head.appendChild(script);
+            }
+            
+            loadNext(0);
+        }
+        
+        // 开始加载扩展
+        loadThreeExtensions();
+    </script>
+    <!-- 高德地图API - 添加3D控制罗盘插件 -->
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=ae9e41fad1e95c52601814053f0ad510&plugin=AMap.Scale,AMap.ToolBar,AMap.InfoWindow,AMap.ControlBar"></script>
+    <!-- 高德地图Three.js图层插件 -->
+    <script src="lib/amap/three-layer.js"></script>
+    <!-- 自定义脚本 -->
+    <script src="utils/draw.js"></script>
+    <script src="3Dview.js"></script>
+    <script>
+        // 确保所有依赖都加载完成后再初始化
+        function checkDependencies() {
+            if (typeof THREE === 'undefined' || 
+                typeof Line2 === 'undefined' || 
+                typeof LineGeometry === 'undefined' || 
+                typeof LineMaterial === 'undefined' || 
+                typeof THREE.CSS2DObject === 'undefined' ||  // 添加CSS2DObject检查
+                typeof AMap === 'undefined') {
+                setTimeout(checkDependencies, 100);
+                return;
+            }
+            
+            // 所有依赖都已加载，初始化地图
+            if (typeof initMap === 'function') {
+                initMap();
+            }
+        }
+        
+        // 开始检查依赖
+        window.addEventListener('load', checkDependencies);
+    </script>
+</head>
+<body>
+    <!-- 地图容器 -->
+    <div id="map"></div>
+
+    <!-- 动画Logo水印 - 单个W型移动 -->
+    <div class="logo-watermark" id="logo-single">
+        <img src="logo.png" alt="臻选家">
+    </div>
+
+    <!-- 画笔工具栏 -->
+    <div id="draw-toolbar">
+        <div class="toolbar-buttons">
+            <button id="start-draw">开启绘图</button>
+            <button id="clear-draw">清除绘图</button>
+        </div>
+        
+        <!-- 颜色选择面板 -->
+        <div id="color-panel" class="color-panel hidden">
+            <div class="color-option selected" data-color="#285FF5" style="background-color: #285FF5;" title="蓝色"></div>
+            <div class="color-option" data-color="#FF0000" style="background-color: #FF0000;" title="红色"></div>
+            <div class="color-option" data-color="#00FF00" style="background-color: #00FF00;" title="绿色"></div>
+            <div class="color-option" data-color="#000000" style="background-color: #252424;" title="黑色"></div>
+            <div class="color-option" data-color="#FFFF00" style="background-color: #FFFF00;" title="黄色"></div>
+            <div class="color-option" data-color="#FF8C00" style="background-color: #FF8C00;" title="橙色"></div>
+            <div class="color-option" data-color="#8A2BE2" style="background-color: #8A2BE2;" title="紫色"></div>
+        </div>
+    </div>
+
+    <!-- Canvas 绘图层 -->
+    <canvas id="draw-canvas"></canvas>
+
+    <!-- 户型图查看器 -->
+    <div id="unit-image-viewer" class="unit-image-viewer">
+        <div class="viewer-overlay"></div>
+        <div class="viewer-container">
+            <div class="viewer-header">
+                <div class="viewer-title">
+                    <span id="viewer-unit-name"></span>
+                    <span id="viewer-unit-info"></span>
+                </div>
+                <button class="viewer-close" id="viewer-close">&times;</button>
+            </div>
+            <div class="viewer-content">
+                <div class="image-container">
+                    <img id="viewer-current-image" src="" alt="户型图">
+                    <canvas id="viewer-draw-canvas" class="viewer-draw-canvas"></canvas>
+                    <div class="image-nav">
+                        <button class="nav-btn prev-btn" id="prev-image">&lt;</button>
+                        <button class="nav-btn next-btn" id="next-image">&gt;</button>
+                    </div>
+                    <div class="image-counter">
+                        <span id="current-index">1</span> / <span id="total-count">1</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
