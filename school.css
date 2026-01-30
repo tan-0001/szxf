@@ -46,6 +46,12 @@ body {
     background: rgba(0, 0, 0, 0.5);
 }
 
+@media (max-width: 768px) {
+    .disclaimer-overlay {
+        background: rgba(0, 0, 0, 0.35);
+    }
+}
+
 .disclaimer-box {
     position: relative;
     max-width: 360px;
@@ -81,7 +87,7 @@ body {
     transform: translateY(-1px);
 }
 
-/* 地图容器 - 使用 dvh 适配移动端地址栏 */
+/* 地图容器 - 与 newpage 移动端一致时用 100% 填满 */
 #map {
     width: 100%;
     height: 100vh;
@@ -89,6 +95,7 @@ body {
     position: relative;
     z-index: 1;
 }
+
 
 /* 画笔工具栏样式 */
 #draw-toolbar {
@@ -204,113 +211,151 @@ body {
     cursor: crosshair;
 }
 
-/* ========== 响应式：平板 (≤1024px) ========== */
+/* ========== 响应式：平板 (≤1024px)，参考 newpage 留白 ========== */
 @media (max-width: 1024px) {
     .disclaimer-box {
         max-width: 90%;
-        padding: 20px;
+        padding: 24px 20px;
     }
     .disclaimer-text {
         font-size: 14px;
+        line-height: 1.6;
     }
     #draw-toolbar {
-        top: 12px;
-        right: 12px;
-        padding: 10px;
+        top: 16px;
+        right: 16px;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
     .location-result-box {
-        left: 12px;
-        bottom: 80px;
+        left: 16px;
+        bottom: 88px;
         min-width: 240px;
+        padding: 16px 18px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
     #close-district-btn {
-        bottom: 80px;
-        right: 12px;
-        padding: 10px 18px;
+        bottom: 88px;
+        right: 16px;
+        padding: 12px 20px;
         font-size: 13px;
+        border-radius: 10px;
     }
 }
 
-/* ========== 响应式：手机 (≤768px) ========== */
+/* ========== 响应式：手机 (≤768px)，与 newpage 一致的移动端显示逻辑（iPhone 感官全屏） ========== */
 @media (max-width: 768px) {
-    body {
+    html, body {
         -webkit-tap-highlight-color: transparent;
+        background-color: #f8f9fa;
+        height: 100%;
+        min-height: 100%;
+    }
+    body {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
     }
     .disclaimer-modal {
-        padding: 16px;
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
+        padding: 20px;
     }
     .disclaimer-box {
         max-width: 100%;
-        padding: 20px 18px;
-        border-radius: 10px;
+        padding: 30px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
     }
     .disclaimer-text {
-        font-size: 14px;
-        line-height: 1.65;
-        margin-bottom: 18px;
+        font-size: 15px;
+        line-height: 1.6;
+        color: #333;
+        margin: 0 0 24px 0;
     }
     .disclaimer-close-btn {
-        padding: 12px 32px;
+        padding: 14px 36px;
         font-size: 15px;
-        min-height: 44px;
+        min-height: 48px;
+        border-radius: 10px;
     }
     #map {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        min-height: 100%;
         height: 100vh;
         height: 100dvh;
+        min-height: -webkit-fill-available;
     }
     #draw-toolbar {
-        top: max(10px, env(safe-area-inset-top));
-        right: max(10px, env(safe-area-inset-right));
-        padding: 8px;
-        border-radius: 10px;
+        top: 16px;
+        right: 16px;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        background: rgba(255, 255, 255, 0.98);
     }
     .toolbar-buttons {
         flex-direction: column;
-        gap: 6px;
-        margin-bottom: 6px;
+        gap: 8px;
+        margin-bottom: 8px;
     }
     .toolbar-buttons button {
-        padding: 12px 14px;
-        font-size: 13px;
+        padding: 14px 18px;
+        font-size: 14px;
         width: 100%;
         min-width: 100px;
-        min-height: 44px;
+        min-height: 48px;
+        border-radius: 10px;
     }
     .color-panel {
-        max-width: 140px;
-        gap: 6px;
+        max-width: 160px;
+        gap: 8px;
     }
     .color-option {
-        width: 22px;
-        height: 22px;
+        width: 24px;
+        height: 24px;
     }
     .location-result-box {
-        left: max(12px, env(safe-area-inset-left));
-        right: max(12px, env(safe-area-inset-right));
-        bottom: max(80px, env(safe-area-inset-bottom) + 60px);
+        left: 16px;
+        right: 16px;
+        bottom: 88px;
         min-width: auto;
-        width: calc(100% - 24px);
-        max-width: 360px;
-        padding: 12px 14px;
+        width: calc(100% - 32px);
+        max-width: 400px;
+        padding: 18px 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        background: rgba(255, 255, 255, 0.98);
     }
     .location-result-title {
-        font-size: 13px;
+        font-size: 14px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
     }
     .location-result-row {
-        font-size: 12px;
+        font-size: 13px;
+        margin-bottom: 8px;
     }
     #close-result-box {
-        min-height: 44px;
-        padding: 10px;
+        min-height: 48px;
+        padding: 12px;
+        margin-top: 14px;
+        border-radius: 8px;
+        font-size: 14px;
     }
     #close-district-btn {
-        bottom: max(80px, env(safe-area-inset-bottom) + 60px);
-        right: max(12px, env(safe-area-inset-right));
-        padding: 12px 20px;
-        font-size: 13px;
-        min-height: 44px;
+        bottom: 88px;
+        right: 16px;
+        padding: 14px 24px;
+        font-size: 14px;
+        min-height: 48px;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
     .school-marker .marker-text {
         font-size: 10px;
@@ -318,86 +363,95 @@ body {
     }
 }
 
-/* ========== 响应式：小屏手机 (≤480px) ========== */
+/* ========== 响应式：小屏手机 (≤480px)，与 newpage 一致的留白 ========== */
 @media (max-width: 480px) {
     .disclaimer-modal {
-        padding: 12px;
+        padding: 16px;
     }
     .disclaimer-box {
-        padding: 18px 14px;
+        padding: 24px 18px;
+        border-radius: 12px;
     }
     .disclaimer-text {
-        font-size: 13px;
-        margin-bottom: 16px;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 20px;
     }
     .disclaimer-close-btn {
-        padding: 11px 24px;
+        padding: 12px 28px;
         font-size: 14px;
+        min-height: 46px;
     }
     #draw-toolbar {
-        top: max(6px, env(safe-area-inset-top));
-        right: max(6px, env(safe-area-inset-right));
-        padding: 6px;
-        border-radius: 8px;
+        top: 12px;
+        right: 12px;
+        padding: 10px;
+        border-radius: 12px;
     }
     .toolbar-buttons button {
-        padding: 10px 12px;
-        font-size: 12px;
-        min-height: 42px;
+        padding: 12px 16px;
+        font-size: 13px;
+        min-height: 46px;
     }
     .color-option {
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
     }
     .location-result-box {
-        left: max(8px, env(safe-area-inset-left));
-        right: max(8px, env(safe-area-inset-right));
-        bottom: max(70px, env(safe-area-inset-bottom) + 50px);
-        width: calc(100% - 16px);
-        padding: 10px 12px;
+        left: 12px;
+        right: 12px;
+        bottom: 80px;
+        width: calc(100% - 24px);
+        padding: 16px 18px;
     }
     .location-result-title {
-        font-size: 12px;
+        font-size: 13px;
     }
     .location-result-row {
-        font-size: 11px;
+        font-size: 12px;
     }
     .location-result-row .label {
-        min-width: 40px;
+        min-width: 42px;
+    }
+    #close-result-box {
+        min-height: 46px;
     }
     #close-district-btn {
-        bottom: max(70px, env(safe-area-inset-bottom) + 50px);
-        right: max(8px, env(safe-area-inset-right));
-        padding: 10px 16px;
-        font-size: 12px;
+        bottom: 80px;
+        right: 12px;
+        padding: 12px 20px;
+        font-size: 13px;
     }
     .school-marker .marker-text {
         font-size: 9px;
-        max-width: 80px;
+        max-width: 88px;
     }
 }
 
-/* ========== 横屏手机 / 小平板 优化 ========== */
+/* ========== 横屏手机 / 小平板，与 newpage 列布局一致 ========== */
 @media (max-width: 768px) and (orientation: landscape) {
     .disclaimer-box {
         max-width: 70%;
+        padding: 24px 28px;
     }
     #draw-toolbar {
-        top: max(6px, env(safe-area-inset-top));
+        top: 12px;
+        right: 12px;
     }
     .toolbar-buttons {
         flex-direction: row;
         flex-wrap: wrap;
+        gap: 8px;
     }
     .toolbar-buttons button {
         width: auto;
         min-width: auto;
     }
     .location-result-box {
-        bottom: max(12px, env(safe-area-inset-bottom));
+        bottom: 16px;
     }
     #close-district-btn {
-        bottom: max(12px, env(safe-area-inset-bottom));
+        bottom: 16px;
     }
 }
 
