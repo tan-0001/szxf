@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学区信息展示</title>
+    <link rel="stylesheet" href="school.css">
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: '2f922f3dfca8c92a9b308bac7f3bd89d',
+        }
+    </script>
+    <!-- 高德地图API - 添加3D控制罗盘插件 -->
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=ae9e41fad1e95c52601814053f0ad510&plugin=AMap.Scale,AMap.ToolBar,AMap.InfoWindow,AMap.ControlBar"></script>
+    <!-- 自定义脚本 -->
+    <script src="utils/draw.js"></script>
+    <script src="school.js"></script>
+</head>
+<body>
+    <!-- 打开页面时的免责声明弹窗 -->
+    <div id="disclaimer-modal" class="disclaimer-modal no-select">
+        <div class="disclaimer-overlay"></div>
+        <div class="disclaimer-box">
+            <p class="disclaimer-text">学区范围为个人制作仅供参考，详细学区信息请咨询教育局。</p>
+            <button id="disclaimer-close-btn" class="disclaimer-close-btn no-select" type="button">我知道了</button>
+        </div>
+    </div>
+
+    <!-- 地图容器 -->
+    <div id="map"></div>
+
+    <!-- 画笔工具栏 -->
+    <div id="draw-toolbar">
+        <div class="toolbar-buttons">
+            <button id="start-draw" class="no-select">开启绘图</button>
+            <button id="clear-draw" class="no-select">清除绘图</button>
+            <button id="pick-location-btn" class="no-select" type="button" title="点击后在地图上点选位置，查询该位置对应的小学、初中学区">点选位置</button>
+        </div>
+        
+        <!-- 颜色选择面板 -->
+        <div id="color-panel" class="color-panel hidden no-select">
+            <div class="color-option selected" data-color="#285FF5" style="background-color: #285FF5;" title="蓝色"></div>
+            <div class="color-option" data-color="#FF0000" style="background-color: #FF0000;" title="红色"></div>
+            <div class="color-option" data-color="#00FF00" style="background-color: #00FF00;" title="绿色"></div>
+            <div class="color-option" data-color="#000000" style="background-color: #252424;" title="黑色"></div>
+            <div class="color-option" data-color="#FFFF00" style="background-color: #FFFF00;" title="黄色"></div>
+            <div class="color-option" data-color="#FF8C00" style="background-color: #FF8C00;" title="橙色"></div>
+            <div class="color-option" data-color="#8A2BE2" style="background-color: #8A2BE2;" title="紫色"></div>
+        </div>
+    </div>
+
+    <!-- 关闭学区范围按钮（查看学区时显示） -->
+    <button id="close-district-btn" class="no-select" type="button" title="退出学区查看">退出学区</button>
+
+    <!-- 点选位置结果展示框 -->
+    <div id="location-result-box" class="location-result-box no-select">
+        <div class="location-result-title">该位置对应学区</div>
+        <div class="location-result-row"><span class="label primary-label">小学：</span><span id="result-primary-name" class="value">—</span></div>
+        <div class="location-result-row"><span class="label middle-label">初中：</span><span id="result-middle-name" class="value">—</span></div>
+        <button id="close-result-box" class="no-select" type="button">关闭</button>
+    </div>
+
+    <!-- Canvas 绘图层 -->
+    <canvas id="draw-canvas"></canvas>
+</body>
+</html>
