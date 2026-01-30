@@ -12,7 +12,7 @@ let pickLocationClickListener = null;
 // 初始化3D地图
 function initMap(center) {
     map = new AMap.Map('map', {
-        zooms: [15,22],
+        zooms: [13.5,22],
         zoom: 16,
         center: center,
         viewMode: '3D',           // 启用3D模式
