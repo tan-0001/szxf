@@ -81,10 +81,11 @@ body {
     transform: translateY(-1px);
 }
 
-/* 地图容器 */
+/* 地图容器 - 使用 dvh 适配移动端地址栏 */
 #map {
     width: 100%;
     height: 100vh;
+    height: 100dvh;
     position: relative;
     z-index: 1;
 }
@@ -186,13 +187,14 @@ body {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* Canvas 绘图层 */
+/* Canvas 绘图层 - 全屏覆盖，移动端适配可视高度 */
 #draw-canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    height: 100dvh;
     z-index: 999;
     pointer-events: none;
 }
@@ -202,36 +204,200 @@ body {
     cursor: crosshair;
 }
 
-/* 移动端适配 */
-@media (max-width: 768px) {
-    #draw-toolbar {
-        top: 10px;
-        right: 10px;
-        padding: 8px;
-        border-radius: 8px;
+/* ========== 响应式：平板 (≤1024px) ========== */
+@media (max-width: 1024px) {
+    .disclaimer-box {
+        max-width: 90%;
+        padding: 20px;
     }
-    
+    .disclaimer-text {
+        font-size: 14px;
+    }
+    #draw-toolbar {
+        top: 12px;
+        right: 12px;
+        padding: 10px;
+    }
+    .location-result-box {
+        left: 12px;
+        bottom: 80px;
+        min-width: 240px;
+    }
+    #close-district-btn {
+        bottom: 80px;
+        right: 12px;
+        padding: 10px 18px;
+        font-size: 13px;
+    }
+}
+
+/* ========== 响应式：手机 (≤768px) ========== */
+@media (max-width: 768px) {
+    body {
+        -webkit-tap-highlight-color: transparent;
+    }
+    .disclaimer-modal {
+        padding: 16px;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .disclaimer-box {
+        max-width: 100%;
+        padding: 20px 18px;
+        border-radius: 10px;
+    }
+    .disclaimer-text {
+        font-size: 14px;
+        line-height: 1.65;
+        margin-bottom: 18px;
+    }
+    .disclaimer-close-btn {
+        padding: 12px 32px;
+        font-size: 15px;
+        min-height: 44px;
+    }
+    #map {
+        height: 100vh;
+        height: 100dvh;
+    }
+    #draw-toolbar {
+        top: max(10px, env(safe-area-inset-top));
+        right: max(10px, env(safe-area-inset-right));
+        padding: 8px;
+        border-radius: 10px;
+    }
     .toolbar-buttons {
         flex-direction: column;
         gap: 6px;
         margin-bottom: 6px;
     }
-    
     .toolbar-buttons button {
-        padding: 10px 12px;
-        font-size: 14px;
+        padding: 12px 14px;
+        font-size: 13px;
         width: 100%;
         min-width: 100px;
+        min-height: 44px;
     }
-    
     .color-panel {
-        max-width: 120px;
-        gap: 4px;
+        max-width: 140px;
+        gap: 6px;
     }
-    
+    .color-option {
+        width: 22px;
+        height: 22px;
+    }
+    .location-result-box {
+        left: max(12px, env(safe-area-inset-left));
+        right: max(12px, env(safe-area-inset-right));
+        bottom: max(80px, env(safe-area-inset-bottom) + 60px);
+        min-width: auto;
+        width: calc(100% - 24px);
+        max-width: 360px;
+        padding: 12px 14px;
+    }
+    .location-result-title {
+        font-size: 13px;
+    }
+    .location-result-row {
+        font-size: 12px;
+    }
+    #close-result-box {
+        min-height: 44px;
+        padding: 10px;
+    }
+    #close-district-btn {
+        bottom: max(80px, env(safe-area-inset-bottom) + 60px);
+        right: max(12px, env(safe-area-inset-right));
+        padding: 12px 20px;
+        font-size: 13px;
+        min-height: 44px;
+    }
+    .school-marker .marker-text {
+        font-size: 10px;
+        max-width: 100px;
+    }
+}
+
+/* ========== 响应式：小屏手机 (≤480px) ========== */
+@media (max-width: 480px) {
+    .disclaimer-modal {
+        padding: 12px;
+    }
+    .disclaimer-box {
+        padding: 18px 14px;
+    }
+    .disclaimer-text {
+        font-size: 13px;
+        margin-bottom: 16px;
+    }
+    .disclaimer-close-btn {
+        padding: 11px 24px;
+        font-size: 14px;
+    }
+    #draw-toolbar {
+        top: max(6px, env(safe-area-inset-top));
+        right: max(6px, env(safe-area-inset-right));
+        padding: 6px;
+        border-radius: 8px;
+    }
+    .toolbar-buttons button {
+        padding: 10px 12px;
+        font-size: 12px;
+        min-height: 42px;
+    }
     .color-option {
         width: 20px;
         height: 20px;
+    }
+    .location-result-box {
+        left: max(8px, env(safe-area-inset-left));
+        right: max(8px, env(safe-area-inset-right));
+        bottom: max(70px, env(safe-area-inset-bottom) + 50px);
+        width: calc(100% - 16px);
+        padding: 10px 12px;
+    }
+    .location-result-title {
+        font-size: 12px;
+    }
+    .location-result-row {
+        font-size: 11px;
+    }
+    .location-result-row .label {
+        min-width: 40px;
+    }
+    #close-district-btn {
+        bottom: max(70px, env(safe-area-inset-bottom) + 50px);
+        right: max(8px, env(safe-area-inset-right));
+        padding: 10px 16px;
+        font-size: 12px;
+    }
+    .school-marker .marker-text {
+        font-size: 9px;
+        max-width: 80px;
+    }
+}
+
+/* ========== 横屏手机 / 小平板 优化 ========== */
+@media (max-width: 768px) and (orientation: landscape) {
+    .disclaimer-box {
+        max-width: 70%;
+    }
+    #draw-toolbar {
+        top: max(6px, env(safe-area-inset-top));
+    }
+    .toolbar-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .toolbar-buttons button {
+        width: auto;
+        min-width: auto;
+    }
+    .location-result-box {
+        bottom: max(12px, env(safe-area-inset-bottom));
+    }
+    #close-district-btn {
+        bottom: max(12px, env(safe-area-inset-bottom));
     }
 }
 
@@ -420,21 +586,3 @@ body {
     box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
 }
 
-/* 超小屏幕适配 */
-@media (max-width: 480px) {
-    #draw-toolbar {
-        top: 5px;
-        right: 5px;
-        padding: 6px;
-    }
-    
-    .toolbar-buttons button {
-        padding: 8px 10px;
-        font-size: 12px;
-    }
-    
-    .color-option {
-        width: 18px;
-        height: 18px;
-    }
-}
