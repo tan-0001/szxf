@@ -1,0 +1,757 @@
+/* 基础样式重置 - 与 school 一致 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+    background-color: #f8f9fa;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    min-height: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    position: relative;
+}
+
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* 搜索框：左上角，默认搜学校，可切换搜楼盘 */
+.search-box {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    z-index: 1002;
+    width: 260px;
+    max-width: calc(100% - 100px);
+}
+
+.search-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 8px;
+    padding: 6px 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.search-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    color: #333;
+    background: transparent;
+}
+
+.search-input::placeholder {
+    color: #999;
+}
+
+.search-toggle {
+    font-size: 12px;
+    color: #285FF5;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.search-toggle:hover {
+    background: rgba(40, 95, 245, 0.1);
+}
+
+.search-dropdown {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin-top: 4px;
+    max-height: 280px;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.search-dropdown.visible {
+    display: block;
+}
+
+.search-dropdown-item {
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.search-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.search-dropdown-item:hover {
+    background: #f5f5f5;
+}
+
+.search-dropdown-empty {
+    padding: 12px;
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+}
+
+#map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* 画笔工具栏 */
+#draw-toolbar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    padding: 8px 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.toolbar-buttons {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.toolbar-buttons button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.toolbar-buttons button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.toolbar-buttons button:active {
+    transform: translateY(0);
+}
+
+.color-panel {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    max-width: 200px;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.color-panel.hidden {
+    display: none;
+}
+
+.color-option {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+    pointer-events: auto;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.color-option.selected {
+    border-color: #333;
+    transform: scale(1.15);
+}
+
+.color-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+#draw-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    pointer-events: none;
+}
+
+#draw-canvas.drawing {
+    pointer-events: all;
+    cursor: crosshair;
+}
+
+/* 楼盘点位样式 - 蓝色，与 school 标签类型一致：文字在上、点在下 */
+.loupan-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.loupan-marker:hover {
+    transform: scale(1.1);
+}
+
+.loupan-marker .marker-text {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.loupan-marker .marker-pin {
+    width: 14px;
+    height: 14px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    position: relative;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.loupan-marker .marker-pin::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}
+
+/* 楼盘 - 蓝色点 */
+.loupan-marker .marker-pin {
+    background: #285FF5;
+}
+
+.loupan-marker .marker-text {
+    background: #285FF5;
+    color: white;
+}
+
+/* ========== 周边配套点位：与楼盘一致的文字/图标大小逻辑，类型用颜色和图标区分（参考高德地图） ========== */
+.poi-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: default;
+    transition: transform 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.poi-marker:hover {
+    transform: scale(1.1);
+}
+
+.poi-marker .marker-text {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+    cursor: default;
+}
+
+.poi-marker .marker-pin {
+    width: 14px;
+    height: 14px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    position: relative;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.poi-marker .marker-pin::after {
+    display: none;
+}
+
+.poi-marker .marker-pin::before {
+    content: attr(data-icon);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    color: #fff;
+    font-size: 9px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* 地铁 - 蓝色（高德地铁色） */
+.poi-marker.poi-subway .marker-pin,
+.poi-marker.poi-subway .marker-text {
+    background: #0091FF;
+    color: #fff;
+}
+
+/* 商业 - 橙色 */
+.poi-marker.poi-commerce .marker-pin,
+.poi-marker.poi-commerce .marker-text {
+    background: #FF6B00;
+    color: #fff;
+}
+
+/* 公园 - 绿色 */
+.poi-marker.poi-park .marker-pin,
+.poi-marker.poi-park .marker-text {
+    background: #52C41A;
+    color: #fff;
+}
+
+/* 政府配套 - 深红 */
+.poi-marker.poi-municipal .marker-pin,
+.poi-marker.poi-municipal .marker-text {
+    background: #CF1322;
+    color: #fff;
+}
+
+/* 医院 - 红色 */
+.poi-marker.poi-hospital .marker-pin,
+.poi-marker.poi-hospital .marker-text {
+    background: #E74C3C;
+    color: #fff;
+}
+
+/* ========== 学区学校点位：与楼盘一致的文字/图标大小逻辑，小学绿色、中学红色（与 school 页面一致） ========== */
+.school-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: default;
+    transition: transform 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.school-marker:hover {
+    transform: scale(1.1);
+}
+
+.school-marker .marker-text {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+    cursor: default;
+}
+
+.school-marker .marker-pin {
+    width: 14px;
+    height: 14px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    position: relative;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.school-marker .marker-pin::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}
+
+/* 小学 - 绿色（与 school 页面一致） */
+.school-marker.primary .marker-pin,
+.school-marker.primary .marker-text {
+    background: #28a745;
+    color: #fff;
+}
+
+/* 中学 - 橙红色（与 school 页面一致） */
+.school-marker.middle .marker-pin,
+.school-marker.middle .marker-text {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* 关闭楼盘范围按钮 */
+#close-district-btn {
+    display: none;
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    z-index: 1001;
+    padding: 5px 12px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #285FF5 0%, #1e3a8a 100%);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(40, 95, 245, 0.4);
+    transition: all 0.2s ease;
+}
+
+#close-district-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(40, 95, 245, 0.5);
+}
+
+#close-district-btn:active {
+    transform: translateY(0);
+}
+
+#close-district-btn.visible {
+    display: block;
+}
+
+/* 配套筛选框 - 顶部居中，紧贴内容无留白，靠近上边 */
+.filter-panel {
+    display: none;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 8px;
+    z-index: 1001;
+    width: fit-content;
+    max-width: calc(100% - 24px);
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 6px;
+    padding: 5px 10px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px 14px;
+}
+
+.filter-panel.visible {
+    display: flex;
+}
+
+.filter-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.filter-item input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: #285FF5;
+    flex-shrink: 0;
+}
+
+/* 响应式：平板 */
+@media (max-width: 1024px) {
+    #draw-toolbar {
+        top: 16px;
+        right: 16px;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    #close-district-btn {
+        bottom: 88px;
+        right: 16px;
+        padding: 5px 12px;
+        font-size: 11px;
+        border-radius: 6px;
+    }
+    .filter-panel {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 8px;
+        padding: 5px 10px;
+        gap: 6px 12px;
+    }
+    .filter-item {
+        font-size: 10px;
+    }
+    .filter-item input[type="checkbox"] {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+/* 响应式：手机 */
+@media (max-width: 768px) {
+    html, body {
+        -webkit-tap-highlight-color: transparent;
+        background-color: #f8f9fa;
+        height: 100%;
+        min-height: 100%;
+    }
+    body {
+        overflow: hidden;
+    }
+    #map {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+    }
+    #draw-toolbar {
+        top: 16px;
+        right: 16px;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        background: rgba(255, 255, 255, 0.98);
+    }
+    .toolbar-buttons {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    .toolbar-buttons button {
+        padding: 6px 12px;
+        font-size: 11px;
+        width: 100%;
+        min-width: 80px;
+        min-height: 32px;
+        border-radius: 6px;
+    }
+    .color-panel {
+        max-width: 160px;
+        gap: 8px;
+    }
+    .color-option {
+        width: 24px;
+        height: 24px;
+    }
+    #close-district-btn {
+        bottom: 88px;
+        right: 16px;
+        padding: 6px 12px;
+        font-size: 11px;
+        min-height: 28px;
+        border-radius: 6px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    .loupan-marker .marker-text {
+        font-size: 10px;
+        max-width: 100px;
+    }
+    .poi-marker .marker-text {
+        font-size: 10px;
+        max-width: 100px;
+    }
+    .poi-marker .marker-pin::before {
+        font-size: 8px;
+    }
+    .school-marker .marker-text {
+        font-size: 10px;
+        max-width: 100px;
+    }
+    .filter-panel {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 8px;
+        padding: 5px 8px;
+        gap: 6px 10px;
+    }
+    .filter-item {
+        font-size: 10px;
+    }
+    .filter-item input[type="checkbox"] {
+        width: 12px;
+        height: 12px;
+    }
+    .search-box {
+        left: 16px;
+        top: 16px;
+        width: 220px;
+    }
+    .search-input {
+        font-size: 12px;
+    }
+    .search-toggle {
+        font-size: 11px;
+    }
+}
+
+/* 响应式：小屏手机 */
+@media (max-width: 480px) {
+    #draw-toolbar {
+        top: 12px;
+        right: 12px;
+        padding: 10px;
+        border-radius: 12px;
+    }
+    .toolbar-buttons button {
+        padding: 5px 10px;
+        font-size: 11px;
+        min-height: 28px;
+    }
+    .color-option {
+        width: 22px;
+        height: 22px;
+    }
+    #close-district-btn {
+        bottom: 80px;
+        right: 12px;
+        padding: 5px 12px;
+        font-size: 11px;
+    }
+    .loupan-marker .marker-text {
+        font-size: 9px;
+        max-width: 88px;
+    }
+    .poi-marker .marker-text {
+        font-size: 9px;
+        max-width: 88px;
+    }
+    .poi-marker .marker-pin::before {
+        font-size: 7px;
+    }
+    .school-marker .marker-text {
+        font-size: 9px;
+        max-width: 88px;
+    }
+    .filter-panel {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 6px;
+        padding: 4px 8px;
+        gap: 5px 8px;
+    }
+    .filter-item {
+        font-size: 9px;
+    }
+    .filter-item input[type="checkbox"] {
+        width: 11px;
+        height: 11px;
+    }
+    .search-box {
+        left: 12px;
+        top: 12px;
+        width: 180px;
+    }
+    .search-input {
+        font-size: 11px;
+    }
+    .search-dropdown-item {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+}
+
+/* 横屏 */
+@media (max-width: 768px) and (orientation: landscape) {
+    #draw-toolbar {
+        top: 12px;
+        right: 12px;
+    }
+    .toolbar-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .toolbar-buttons button {
+        width: auto;
+        min-width: auto;
+    }
+    #close-district-btn {
+        bottom: 16px;
+    }
+    .filter-panel {
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
