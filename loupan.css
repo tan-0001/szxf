@@ -298,162 +298,76 @@ body {
     color: white;
 }
 
-/* ========== 周边配套点位：与楼盘一致的文字/图标大小逻辑，类型用颜色和图标区分（参考高德地图） ========== */
-.poi-marker {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: default;
-    transition: transform 0.2s;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-
-.poi-marker:hover {
-    transform: scale(1.1);
-}
-
-.poi-marker .marker-text {
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 11px;
-    font-weight: 500;
-    text-align: center;
-    white-space: nowrap;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 2px;
-    cursor: default;
-}
-
-.poi-marker .marker-pin {
-    width: 14px;
-    height: 14px;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
+/* ========== 周边配套与学校点位：与 3Dview 一致（竖线+文字+底部圆点，颜色按类型） ========== */
+.facility-label-3d {
     position: relative;
-    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
 }
 
-.poi-marker .marker-pin::after {
-    display: none;
-}
-
-.poi-marker .marker-pin::before {
-    content: attr(data-icon);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(45deg);
-    color: #fff;
-    font-size: 9px;
-    font-weight: bold;
-    line-height: 1;
-}
-
-/* 地铁 - 蓝色（高德地铁色） */
-.poi-marker.poi-subway .marker-pin,
-.poi-marker.poi-subway .marker-text {
-    background: #0091FF;
-    color: #fff;
-}
-
-/* 商业 - 橙色 */
-.poi-marker.poi-commerce .marker-pin,
-.poi-marker.poi-commerce .marker-text {
-    background: #FF6B00;
-    color: #fff;
-}
-
-/* 公园 - 绿色 */
-.poi-marker.poi-park .marker-pin,
-.poi-marker.poi-park .marker-text {
-    background: #52C41A;
-    color: #fff;
-}
-
-/* 政府配套 - 深红 */
-.poi-marker.poi-municipal .marker-pin,
-.poi-marker.poi-municipal .marker-text {
-    background: #CF1322;
-    color: #fff;
-}
-
-/* 医院 - 红色 */
-.poi-marker.poi-hospital .marker-pin,
-.poi-marker.poi-hospital .marker-text {
-    background: #E74C3C;
-    color: #fff;
-}
-
-/* ========== 学区学校点位：与楼盘一致的文字/图标大小逻辑，小学绿色、中学红色（与 school 页面一致） ========== */
-.school-marker {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: default;
-    transition: transform 0.2s;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-
-.school-marker:hover {
-    transform: scale(1.1);
-}
-
-.school-marker .marker-text {
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 11px;
-    font-weight: 500;
-    text-align: center;
-    white-space: nowrap;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 2px;
-    cursor: default;
-}
-
-.school-marker .marker-pin {
-    width: 14px;
-    height: 14px;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    position: relative;
-    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
-}
-
-.school-marker .marker-pin::after {
+.facility-label-3d::before {
     content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
     width: 6px;
     height: 6px;
+    background: var(--facility-color);
+    border: 1px solid white;
     border-radius: 50%;
-    background: white;
+    transform: translateX(-50%);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.facility-label-3d .facility-line {
     position: absolute;
-    top: 4px;
-    left: 4px;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    height: 30px;
+    background: linear-gradient(to top, var(--facility-color), rgba(0, 0, 0, 0.8));
+    transform: translateX(-50%);
+    border-radius: 1px;
 }
 
-/* 小学 - 绿色（与 school 页面一致） */
-.school-marker.primary .marker-pin,
-.school-marker.primary .marker-text {
-    background: #28a745;
-    color: #fff;
+.facility-label-3d .facility-content {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
 }
 
-/* 中学 - 橙红色（与 school 页面一致） */
-.school-marker.middle .marker-pin,
-.school-marker.middle .marker-text {
-    background: #e74c3c;
-    color: #fff;
+.facility-label-3d .facility-text {
+    background: linear-gradient(135deg, var(--facility-color), var(--facility-color));
+    color: white;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    white-space: nowrap;
+}
+
+.facility-label-3d .facility-text::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 3px solid transparent;
+    border-top-color: var(--facility-color);
+}
+
+.facility-label-3d {
+    animation: labelAppear 0.6s ease-out forwards;
+}
+
+@keyframes labelAppear {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
 /* 关闭楼盘范围按钮 */
@@ -485,6 +399,38 @@ body {
 }
 
 #close-district-btn.visible {
+    display: block;
+}
+
+/* 楼盘VR按钮 - 在退出楼盘下方，有 vrUrl 时显示 */
+.loupan-vr-btn {
+    display: none;
+    position: fixed;
+    bottom: 64px;
+    right: 20px;
+    z-index: 1001;
+    padding: 5px 12px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(40, 167, 69, 0.4);
+    transition: all 0.2s ease;
+}
+
+.loupan-vr-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(40, 167, 69, 0.5);
+}
+
+.loupan-vr-btn:active {
+    transform: translateY(0);
+}
+
+.loupan-vr-btn.visible {
     display: block;
 }
 
@@ -548,6 +494,10 @@ body {
         padding: 5px 12px;
         font-size: 11px;
         border-radius: 6px;
+    }
+    .loupan-vr-btn {
+        bottom: 52px;
+        right: 16px;
     }
     .filter-panel {
         left: 50%;
@@ -623,20 +573,32 @@ body {
         border-radius: 6px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
+    .loupan-vr-btn {
+        bottom: 52px;
+        right: 16px;
+    }
     .loupan-marker .marker-text {
         font-size: 10px;
         max-width: 100px;
     }
-    .poi-marker .marker-text {
-        font-size: 10px;
-        max-width: 100px;
-    }
-    .poi-marker .marker-pin::before {
+    .facility-label-3d .facility-text {
         font-size: 8px;
+        padding: 2px 4px;
     }
-    .school-marker .marker-text {
-        font-size: 10px;
-        max-width: 100px;
+    .facility-label-3d .facility-line {
+        height: 25px;
+    }
+    .facility-label-3d .facility-content {
+        bottom: 25px;
+    }
+    .facility-label-3d::before {
+        width: 4px;
+        height: 4px;
+        bottom: -2px;
+    }
+    .facility-label-3d .facility-text::after {
+        border: 2px solid transparent;
+        border-top-color: var(--facility-color);
     }
     .filter-panel {
         left: 50%;
@@ -688,20 +650,28 @@ body {
         padding: 5px 12px;
         font-size: 11px;
     }
+    .loupan-vr-btn {
+        bottom: 46px;
+        right: 12px;
+    }
     .loupan-marker .marker-text {
         font-size: 9px;
         max-width: 88px;
     }
-    .poi-marker .marker-text {
-        font-size: 9px;
-        max-width: 88px;
-    }
-    .poi-marker .marker-pin::before {
+    .facility-label-3d .facility-text {
         font-size: 7px;
+        padding: 2px 4px;
     }
-    .school-marker .marker-text {
-        font-size: 9px;
-        max-width: 88px;
+    .facility-label-3d .facility-line {
+        height: 22px;
+    }
+    .facility-label-3d .facility-content {
+        bottom: 22px;
+    }
+    .facility-label-3d::before {
+        width: 4px;
+        height: 4px;
+        bottom: -2px;
     }
     .filter-panel {
         left: 50%;
@@ -747,6 +717,9 @@ body {
         min-width: auto;
     }
     #close-district-btn {
+        bottom: 50px;
+    }
+    .loupan-vr-btn {
         bottom: 16px;
     }
     .filter-panel {
