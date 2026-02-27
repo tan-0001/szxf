@@ -35,7 +35,7 @@ function initMap(center) {
         center: center,
         viewMode: '3D',
         terrain: true,
-        pitch: 0,
+        pitch: 30,
         rotation: 0,
         scrollWheel: true,
         zoomEnable: true,
@@ -202,13 +202,15 @@ function getSchoolsForLoupan(loupan) {
     return { primary: primary, middle: middle };
 }
 
-// 创建学校点位 DOM（与 school 页面一致：文字在上、点在下，小学绿色、中学红色）
+// 创建学校点位 DOM：与 3Dview 一致（竖线+文字+底部圆点，小学亮红、中学深红）
 function createSchoolMarkerContent(school, type) {
-    var cls = type === 'primary' ? 'primary' : 'middle';
+    var color = type === 'primary' ? SCHOOL_COLOR.primary : SCHOOL_COLOR.middle;
     var name = escapeHtml(school.name);
-    return '<div class="school-marker ' + cls + '">' +
-        '<div class="marker-text">' + name + '</div>' +
-        '<div class="marker-pin"></div>' +
+    return '<div class="facility-label-3d" style="--facility-color:' + color + '">' +
+        '<div class="facility-line"></div>' +
+        '<div class="facility-content">' +
+        '<div class="facility-text">' + name + '</div>' +
+        '</div>' +
         '</div>';
 }
 
@@ -256,14 +258,16 @@ function getDistanceKm(lng1, lat1, lng2, lat2) {
     return R * c;
 }
 
-// 周边配套类型配置：高德风格图标与颜色（参考 ditu.amap.com）
+// 周边配套类型配置：与 3Dview 一致的颜色与显示逻辑
 var POI_CONFIG = {
-    subway:   { label: '地铁',   icon: '铁', color: '#0091FF' },
-    commerce: { label: '商业',   icon: '商', color: '#FF6B00' },
-    park:     { label: '公园',   icon: '公', color: '#52C41A' },
-    municipal:{ label: '政府',   icon: '政', color: '#CF1322' },
-    hospital: { label: '医院',   icon: '医', color: '#E74C3C' }
+    subway:   { label: '地铁', color: '#12c6d1' },
+    commerce: { label: '商业', color: '#ec25ad' },
+    park:     { label: '公园', color: '#4CAF50' },
+    municipal:{ label: '政府', color: '#4CAF50' },
+    hospital: { label: '医院', color: '#FF6B6B' }
 };
+// 学校颜色：与 3Dview 一致
+var SCHOOL_COLOR = { primary: '#e02208', middle: '#b71c1c' };
 
 // 按距离筛选楼盘周边配套（默认 3km）
 function getNearbyPois(loupan, radiusKm) {
@@ -286,14 +290,16 @@ function getNearbyPois(loupan, radiusKm) {
     };
 }
 
-// 创建单个配套点位 DOM（与楼盘点位一致：文字在上、点在下，点内为类型图标）
+// 创建单个配套点位 DOM：与 3Dview 一致（竖线+文字+底部圆点，颜色按类型）
 function createPoiMarkerContent(item, typeKey) {
-    var cfg = POI_CONFIG[typeKey] || { icon: '', color: '#666' };
+    var cfg = POI_CONFIG[typeKey] || { color: '#666' };
     var name = escapeHtml(item.name);
-    var icon = cfg.icon;
-    return '<div class="poi-marker poi-' + typeKey + '">' +
-        '<div class="marker-text">' + name + '</div>' +
-        '<div class="marker-pin" data-icon="' + escapeHtml(icon) + '"></div>' +
+    var color = cfg.color;
+    return '<div class="facility-label-3d" style="--facility-color:' + color + '">' +
+        '<div class="facility-line"></div>' +
+        '<div class="facility-content">' +
+        '<div class="facility-text">' + name + '</div>' +
+        '</div>' +
         '</div>';
 }
 
@@ -408,8 +414,8 @@ function showSchoolDistrict(school, type) {
     }
     currentSchoolDistrictPath = path;
     currentSchoolDistrictSchool = { school: school, type: type };
-    var strokeColor = type === 'primary' ? '#28a745' : '#e74c3c';
-    var fillColor = type === 'primary' ? '#28a745' : '#e74c3c';
+    var strokeColor = type === 'primary' ? SCHOOL_COLOR.primary : SCHOOL_COLOR.middle;
+    var fillColor = type === 'primary' ? SCHOOL_COLOR.primary : SCHOOL_COLOR.middle;
     currentSchoolDistrictPolygon = new AMap.Polygon({
         path: path,
         strokeColor: strokeColor,
@@ -464,6 +470,15 @@ function showLoupanPolygon(loupan, key) {
     if (btn) btn.classList.add('visible');
     var filterPanel = document.getElementById('filter-panel');
     if (filterPanel) filterPanel.classList.add('visible');
+
+    var vrBtn = document.getElementById('loupan-vr-btn');
+    if (vrBtn) {
+        if (loupan.vrUrl) {
+            vrBtn.classList.add('visible');
+        } else {
+            vrBtn.classList.remove('visible');
+        }
+    }
 }
 
 // 关闭楼盘范围：移除楼盘多边形与配套点位，保留学区边框，只显示学区内楼盘
@@ -481,6 +496,8 @@ function closeLoupanView() {
     if (btn) btn.classList.remove('visible');
     var filterPanel = document.getElementById('filter-panel');
     if (filterPanel) filterPanel.classList.remove('visible');
+    var vrBtn = document.getElementById('loupan-vr-btn');
+    if (vrBtn) vrBtn.classList.remove('visible');
 }
 
 function escapeHtml(str) {
@@ -499,6 +516,8 @@ function clearLoupanMarkers() {
     clearSchoolMarkers();
     var btn = document.getElementById('close-district-btn');
     if (btn) btn.classList.remove('visible');
+    var vrBtn = document.getElementById('loupan-vr-btn');
+    if (vrBtn) vrBtn.classList.remove('visible');
     loupanMarkers.forEach(function(item) {
         map.remove(item.marker);
     });
@@ -508,6 +527,14 @@ function clearLoupanMarkers() {
 function initCloseDistrictButton() {
     var btn = document.getElementById('close-district-btn');
     if (btn) btn.addEventListener('click', closeLoupanView);
+    var vrBtn = document.getElementById('loupan-vr-btn');
+    if (vrBtn) {
+        vrBtn.addEventListener('click', function() {
+            if (currentLoupan && currentLoupan.vrUrl) {
+                window.open(currentLoupan.vrUrl, '_blank');
+            }
+        });
+    }
 }
 
 // 将 filterState 同步到筛选框复选框
