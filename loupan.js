@@ -26,6 +26,77 @@ let searchMode = 'school'; // 'school' | 'loupan'
 let currentSchoolDistrictPolygon = null; // 当前选中的学区多边形，退出楼盘后保留
 let currentSchoolDistrictPath = null;     // 学区路径数组，用于判断楼盘是否在内
 let currentSchoolDistrictSchool = null;  // 当前学区对应的学校（含 type: primary|middle）
+// VR 列表：从 VR 文件夹（/api/vr/folders 或 VR/list.json）解析，key 为楼盘名，value 为 { groupName, propertyName }
+let vrListMap = {};
+
+// 从 VR 文件夹结构解析楼盘名 -> [{ groupName, propertyName }, ...]（同一楼盘名可在多分组下存在）
+function loadVrList() {
+    var apiUrl = '/api/vr/folders';
+    var listUrl = 'VR/list.json';
+    return fetch(apiUrl)
+        .then(function (r) {
+            if (r.ok) return r.json();
+            return Promise.reject(new Error('api'));
+        })
+        .then(function (data) {
+            vrListMap = {};
+            var groups = (data && data.groups) ? data.groups : [];
+            groups.forEach(function (g) {
+                var groupName = g.name;
+                (g.properties || []).forEach(function (propertyName) {
+                    if (!propertyName) return;
+                    if (!vrListMap[propertyName]) vrListMap[propertyName] = [];
+                    vrListMap[propertyName].push({ groupName: groupName, propertyName: propertyName });
+                });
+            });
+        })
+        .catch(function () {
+            return fetch(listUrl).then(function (r) {
+                if (!r.ok) return;
+                return r.json();
+            }).then(function (data) {
+                vrListMap = {};
+                var groups = (data && data.groups) ? data.groups : [];
+                if (groups.length) {
+                    groups.forEach(function (g) {
+                        var groupName = g.name;
+                        (g.properties || []).forEach(function (propertyName) {
+                            if (!propertyName) return;
+                            if (!vrListMap[propertyName]) vrListMap[propertyName] = [];
+                            vrListMap[propertyName].push({ groupName: groupName, propertyName: propertyName });
+                        });
+                    });
+                } else {
+                    var list = (data && data.list) ? data.list : [];
+                    list.forEach(function (item) {
+                        var name = item.propertyName || item.name;
+                        if (!name) return;
+                        if (!vrListMap[name]) vrListMap[name] = [];
+                        vrListMap[name].push({
+                            groupName: item.groupName || item.group || '',
+                            propertyName: name
+                        });
+                    });
+                }
+            });
+        });
+}
+
+// 根据当前楼盘解析 VR 链接：按楼盘名匹配；若楼盘有 districtName/vrGroup 则优先匹配该分组，否则取第一个
+function getVrUrlForLoupan(loupan) {
+    if (!loupan || !loupan.name) return null;
+    var name = loupan.name.trim();
+    var wantGroup = (loupan.districtName || loupan.vrGroup || '').trim();
+    var entries = vrListMap[name];
+    if (!entries || !entries.length) return null;
+    var entry = wantGroup
+        ? entries.filter(function (e) { return e.groupName === wantGroup; })[0]
+        : entries[0];
+    if (!entry) return null;
+    var base = 'VR/vrview.html';
+    var q = 'groupName=' + encodeURIComponent(entry.groupName) + '&propertyName=' + encodeURIComponent(entry.propertyName);
+    return base + '?' + q;
+}
 
 // 初始化地图（与 school.html 相同的高德地图配置）
 function initMap(center) {
@@ -77,6 +148,24 @@ function initMap(center) {
     map.on('zoomend', function() {
         currentZoom = map.getZoom();
     });
+
+    initLoupanVr3dClick();
+}
+
+// 用 mousedown 捕获记录 VR/3D 的 href，marker 的 click 里若存在则打开并 return（地图可能用坐标派发 click）
+window.__loupanVr3dHref = null;
+function bindVr3dMouseDown(el) {
+    if (!el || el._loupanVr3dBound) return;
+    el._loupanVr3dBound = true;
+    el.addEventListener('mousedown', function(e) {
+        var btn = e.target && e.target.closest ? e.target.closest('.loupan-label-vr-btn, .loupan-label-3d-btn') : null;
+        if (btn) window.__loupanVr3dHref = btn.getAttribute('data-href') || null;
+        else window.__loupanVr3dHref = null;
+    }, true);
+}
+function initLoupanVr3dClick() {
+    bindVr3dMouseDown(document);
+    if (map && map.getContainer) bindVr3dMouseDown(map.getContainer());
 }
 
 // 加载楼盘及配套数据
@@ -363,7 +452,40 @@ function getLoupanPath(loupan) {
     return ring;
 }
 
-// 创建楼盘点位：蓝色点 + 楼盘名字；可选仅显示学区内的楼盘
+// 判断是否存在3D楼盘数据：data 下是否有与楼盘名同名的文件夹（通过请求 buildings.json 判断）
+function has3DLoupan(communityName) {
+    if (!communityName) return Promise.resolve(false);
+    var url = 'data/' + encodeURIComponent(communityName) + '/buildings.json';
+    return fetch(url).then(function(res) { return res.ok; }).catch(function() { return false; });
+}
+
+// 生成楼盘点位 HTML：楼盘名称单独整体（含倒三角），VR/3D 圆圈紧挨名称后方
+function getLoupanMarkerContent(loupan, opts) {
+    opts = opts || {};
+    var name = escapeHtml(loupan.name);
+    var vrUrl = opts.vrUrl;
+    var has3D = opts.has3D;
+    var vrBtn = '';
+    if (vrUrl) {
+        var vrUrlEsc = escapeHtml(vrUrl);
+        vrBtn = '<span class="loupan-label-vr-btn" role="button" data-href="' + vrUrlEsc + '" title="楼盘VR">VR</span>';
+    }
+    var threeDBtn = '';
+    if (has3D && loupan.name) {
+        var threeDUrl = '3Dview.html?community=' + encodeURIComponent(loupan.name);
+        threeDBtn = '<span class="loupan-label-3d-btn" role="button" data-href="' + threeDUrl + '" title="楼盘3D">3D</span>';
+    }
+    var actionsHtml = (vrBtn || threeDBtn) ? ('<div class="label-actions">' + vrBtn + threeDBtn + '</div>') : '';
+    return '<div class="community-label-3d">' +
+        '<img src="icon/loupan@3x.png" class="community-marker-icon" alt="">' +
+        '<div class="label-content">' +
+        '<div class="label-text">' + name + '</div>' +
+        actionsHtml +
+        '</div>' +
+        '</div>';
+}
+
+// 创建楼盘点位：名称+图标一体，进入楼盘后名称后方显示 VR/3D 圆圈按钮
 function initLoupanMarkers() {
     if (!map || typeof AMap === 'undefined') return;
     clearLoupanMarkers();
@@ -373,18 +495,33 @@ function initLoupanMarkers() {
     currentSchoolDistrictSchool = null;
 
     loupanData.loupanList.forEach(function(loupan) {
-        var markerContent =
-            '<div class="loupan-marker">' +
-            '<div class="marker-text">' + escapeHtml(loupan.name) + '</div>' +
-            '<div class="marker-pin"></div>' +
-            '</div>';
+        var markerContent = getLoupanMarkerContent(loupan, {});
         var marker = new AMap.Marker({
             position: loupan.coordinates,
             content: markerContent,
             anchor: 'bottom-center'
         });
         var key = loupan.id || loupan.name;
-        marker.on('click', function() {
+        marker.on('click', function(ev) {
+            var href = window.__loupanVr3dHref;
+            if (href) {
+                window.__loupanVr3dHref = null;
+                window.open(href, '_blank');
+                return;
+            }
+            var domTarget = (ev && (ev.originalEvent || ev.domEvent)) ? (ev.originalEvent || ev.domEvent).target : null;
+            if (domTarget && typeof domTarget.closest === 'function') {
+                var btn = domTarget.closest('.loupan-label-vr-btn, .loupan-label-3d-btn');
+                if (btn) {
+                    var h = btn.getAttribute('data-href');
+                    if (h) window.open(h, '_blank');
+                    return;
+                }
+            }
+            if (currentLoupanKey === key) {
+                closeLoupanView();
+                return;
+            }
             showLoupanPolygon(loupan, key);
         });
         loupanMarkers.push({ marker: marker, loupan: loupan, key: key });
@@ -403,7 +540,7 @@ function refreshLoupanMarkersVisibility() {
     });
 }
 
-// 选择学校：显示学区多边形，只显示学区内楼盘，地图视野包含学区
+// 选择学校：显示学区多边形，只显示学区内楼盘，并显示该学校（样式与进入楼盘后显示学校一致）
 function showSchoolDistrict(school, type) {
     var path = getSchoolDistrictPath(school);
     if (!path || path.length < 3) return;
@@ -427,6 +564,8 @@ function showSchoolDistrict(school, type) {
     });
     map.add(currentSchoolDistrictPolygon);
     refreshLoupanMarkersVisibility();
+    var schoolPayload = type === 'primary' ? { primary: [school], middle: [] } : { primary: [], middle: [school] };
+    showSchoolMarkers(schoolPayload);
     map.setFitView([currentSchoolDistrictPolygon], false, [40, 40, 40, 40]);
 }
 
@@ -437,7 +576,7 @@ function centerMapOnLoupan(loupan) {
     map.setZoom(16);
 }
 
-// 显示楼盘多边形：绘制多边形，隐藏其他楼盘点位，显示退出按钮
+// 显示楼盘多边形：绘制多边形，隐藏其他楼盘点位，名称后方显示 VR/3D 圆圈按钮，隐藏左下角 VR/3D 按钮组
 function showLoupanPolygon(loupan, key) {
     const path = getLoupanPath(loupan);
     if (!path) return;
@@ -471,18 +610,22 @@ function showLoupanPolygon(loupan, key) {
     var filterPanel = document.getElementById('filter-panel');
     if (filterPanel) filterPanel.classList.add('visible');
 
-    var vrBtn = document.getElementById('loupan-vr-btn');
-    if (vrBtn) {
-        if (loupan.vrUrl) {
-            vrBtn.classList.add('visible');
-        } else {
-            vrBtn.classList.remove('visible');
+    var vrUrl = getVrUrlForLoupan(loupan);
+    has3DLoupan(loupan.name).then(function(has3D) {
+        if (!currentLoupan || currentLoupan !== loupan) return;
+        var item = loupanMarkers.filter(function(x) { return x.key === key; })[0];
+        if (item && item.marker) {
+            item.marker.setContent(getLoupanMarkerContent(loupan, { vrUrl: vrUrl, has3D: has3D }));
         }
-    }
+    });
+    var extraBtns = document.getElementById('loupan-extra-btns');
+    if (extraBtns) extraBtns.classList.remove('visible');
 }
 
-// 关闭楼盘范围：移除楼盘多边形与配套点位，保留学区边框，只显示学区内楼盘
+// 关闭楼盘范围：移除楼盘多边形与配套点位，恢复当前楼盘点位为仅名称，保留学区边框
 function closeLoupanView() {
+    var key = currentLoupanKey;
+    var loupan = currentLoupan;
     if (currentLoupanPolygon) {
         map.remove(currentLoupanPolygon);
         currentLoupanPolygon = null;
@@ -491,13 +634,25 @@ function closeLoupanView() {
     currentLoupan = null;
     clearPoiMarkers();
     clearSchoolMarkers();
+    if (key && loupan) {
+        var item = loupanMarkers.filter(function(x) { return x.key === key; })[0];
+        if (item && item.marker) {
+            item.marker.setContent(getLoupanMarkerContent(loupan, {}));
+        }
+    }
     refreshLoupanMarkersVisibility();
+    if (currentSchoolDistrictSchool) {
+        var s = currentSchoolDistrictSchool.school;
+        var t = currentSchoolDistrictSchool.type;
+        var payload = t === 'primary' ? { primary: [s], middle: [] } : { primary: [], middle: [s] };
+        showSchoolMarkers(payload);
+    }
     var btn = document.getElementById('close-district-btn');
     if (btn) btn.classList.remove('visible');
     var filterPanel = document.getElementById('filter-panel');
     if (filterPanel) filterPanel.classList.remove('visible');
-    var vrBtn = document.getElementById('loupan-vr-btn');
-    if (vrBtn) vrBtn.classList.remove('visible');
+    var extraBtns = document.getElementById('loupan-extra-btns');
+    if (extraBtns) extraBtns.classList.remove('visible');
 }
 
 function escapeHtml(str) {
@@ -518,6 +673,10 @@ function clearLoupanMarkers() {
     if (btn) btn.classList.remove('visible');
     var vrBtn = document.getElementById('loupan-vr-btn');
     if (vrBtn) vrBtn.classList.remove('visible');
+    var threeDBtn = document.getElementById('loupan-3d-btn');
+    if (threeDBtn) threeDBtn.classList.remove('visible');
+    var extraBtns = document.getElementById('loupan-extra-btns');
+    if (extraBtns) extraBtns.classList.remove('visible');
     loupanMarkers.forEach(function(item) {
         map.remove(item.marker);
     });
@@ -530,8 +689,16 @@ function initCloseDistrictButton() {
     var vrBtn = document.getElementById('loupan-vr-btn');
     if (vrBtn) {
         vrBtn.addEventListener('click', function() {
-            if (currentLoupan && currentLoupan.vrUrl) {
-                window.open(currentLoupan.vrUrl, '_blank');
+            var url = currentLoupan ? getVrUrlForLoupan(currentLoupan) : null;
+            if (url) window.open(url, '_blank');
+        });
+    }
+    var threeDBtn = document.getElementById('loupan-3d-btn');
+    if (threeDBtn) {
+        threeDBtn.addEventListener('click', function() {
+            if (currentLoupan && currentLoupan.name) {
+                var url = 'http://localhost:3000/3Dview.html?community=' + encodeURIComponent(currentLoupan.name);
+                window.open(url, '_blank');
             }
         });
     }
@@ -742,6 +909,7 @@ document.addEventListener('DOMContentLoaded', function() {
     map.on('complete', function() {
         loadLoupanData();
         loadSchoolData();
+        loadVrList();
         initCloseDistrictButton();
         initFilterPanel();
         initSearchBox();
