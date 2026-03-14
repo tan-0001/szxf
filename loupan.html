@@ -47,8 +47,11 @@
 
     <!-- 关闭楼盘范围按钮（查看楼盘多边形时显示） -->
     <button id="close-district-btn" class="no-select" type="button" title="退出楼盘范围">退出楼盘</button>
-    <!-- 楼盘VR按钮（有 vrUrl 时显示，在退出楼盘下方） -->
-    <button id="loupan-vr-btn" class="no-select loupan-vr-btn" type="button" title="打开楼盘VR">楼盘VR</button>
+    <!-- 楼盘VR/3D按钮组（有 vrUrl 或存在3D数据时显示，在退出楼盘下方） -->
+    <div id="loupan-extra-btns" class="loupan-extra-btns">
+        <button id="loupan-vr-btn" class="no-select loupan-extra-btn loupan-vr-btn" type="button" title="打开楼盘VR">楼盘VR</button>
+        <button id="loupan-3d-btn" class="no-select loupan-extra-btn loupan-3d-btn" type="button" title="打开楼盘3D">楼盘3D</button>
+    </div>
 
     <!-- 配套筛选框（进入楼盘后显示，顶部一行） -->
     <div id="filter-panel" class="filter-panel no-select">
