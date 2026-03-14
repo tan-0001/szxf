@@ -697,7 +697,7 @@ function initCloseDistrictButton() {
     if (threeDBtn) {
         threeDBtn.addEventListener('click', function() {
             if (currentLoupan && currentLoupan.name) {
-                var url = 'http://localhost:3000/3Dview.html?community=' + encodeURIComponent(currentLoupan.name);
+                var url = 'https://tan-0001.github.io/szxf/3Dview.html?community=' + encodeURIComponent(currentLoupan.name);
                 window.open(url, '_blank');
             }
         });
