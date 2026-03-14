@@ -232,11 +232,9 @@ body {
     cursor: crosshair;
 }
 
-/* 楼盘点位样式 - 蓝色，与 school 标签类型一致：文字在上、点在下 */
-.loupan-marker {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* 楼盘点位样式 - 与 3Dview 一致：楼盘图标图 + 名称框 + 底部小倒三角 */
+.community-label-3d {
+    position: relative;
     cursor: pointer;
     transition: transform 0.2s;
     user-select: none;
@@ -245,57 +243,104 @@ body {
     -ms-user-select: none;
 }
 
-.loupan-marker:hover {
-    transform: scale(1.1);
+.community-label-3d:hover {
+    transform: scale(1.08);
 }
 
-.loupan-marker .marker-text {
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 11px;
-    font-weight: 500;
-    text-align: center;
-    white-space: nowrap;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 2px;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+.community-label-3d::before,
+.community-label-3d .label-line {
+    display: none;
 }
 
-.loupan-marker .marker-pin {
-    width: 14px;
-    height: 14px;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    position: relative;
-    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
-}
-
-.loupan-marker .marker-pin::after {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: white;
+.community-marker-icon {
+    display: block;
+    width: 20px;
+    height: 34px;
     position: absolute;
-    top: 4px;
-    left: 4px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    object-fit: contain;
+    pointer-events: none;
 }
 
-/* 楼盘 - 蓝色点 */
-.loupan-marker .marker-pin {
-    background: #285FF5;
+/* 名称居中于图标正上方；VR/3D 用绝对定位紧挨名称右侧，不参与居中 */
+.community-label-3d .label-content {
+    position: absolute;
+    bottom: 34px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    display: inline-block;
 }
 
-.loupan-marker .marker-text {
-    background: #285FF5;
+/* 楼盘名称单独整体：名称框 + 下方倒三角（占位决定 label-content 宽度，用于居中） */
+.community-label-3d .label-text {
+    position: relative;
+    background: linear-gradient(135deg, #285FF5, #4A90E2);
     color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    box-shadow: 0 3px 12px rgba(40, 95, 245, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    white-space: nowrap;
+    max-width: 100px;
+    overflow: visible;
+    text-overflow: ellipsis;
+}
+
+/* VR/3D 圆圈紧挨名称后方，绝对定位不参与居中 */
+.community-label-3d .label-actions {
+    position: absolute;
+    left: 100%;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+    margin-left: 2px;
+}
+
+.community-label-3d .loupan-label-vr-btn,
+.community-label-3d .loupan-label-3d-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    color: #285FF5;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+}
+
+.community-label-3d .loupan-label-vr-btn:hover,
+.community-label-3d .loupan-label-3d-btn:hover {
+    background: #fff;
+    transform: scale(1.1);
+    color: #1a4fc4;
+}
+
+.community-label-3d .label-text::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #285FF5;
+    filter: drop-shadow(0 1px 2px rgba(40, 95, 245, 0.3));
 }
 
 /* ========== 周边配套与学校点位：与 3Dview 一致（竖线+文字+底部圆点，颜色按类型） ========== */
@@ -402,35 +447,50 @@ body {
     display: block;
 }
 
-/* 楼盘VR按钮 - 在退出楼盘下方，有 vrUrl 时显示 */
-.loupan-vr-btn {
+/* 楼盘VR/3D按钮组 - 在退出楼盘下方，有 vrUrl 或存在3D数据时显示 */
+.loupan-extra-btns {
     display: none;
     position: fixed;
     bottom: 64px;
     right: 20px;
     z-index: 1001;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+}
+
+.loupan-extra-btns.visible {
+    display: flex;
+}
+
+.loupan-extra-btn {
+    display: none;
     padding: 5px 12px;
     border: none;
     border-radius: 6px;
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
     font-size: 11px;
     font-weight: 500;
     cursor: pointer;
-    box-shadow: 0 2px 10px rgba(40, 167, 69, 0.4);
     transition: all 0.2s ease;
 }
 
-.loupan-vr-btn:hover {
+.loupan-vr-btn,
+.loupan-3d-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    box-shadow: 0 2px 10px rgba(40, 167, 69, 0.4);
+}
+
+.loupan-extra-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 14px rgba(40, 167, 69, 0.5);
 }
 
-.loupan-vr-btn:active {
+.loupan-extra-btn:active {
     transform: translateY(0);
 }
 
-.loupan-vr-btn.visible {
+.loupan-extra-btn.visible {
     display: block;
 }
 
@@ -495,7 +555,7 @@ body {
         font-size: 11px;
         border-radius: 6px;
     }
-    .loupan-vr-btn {
+    .loupan-extra-btns {
         bottom: 52px;
         right: 16px;
     }
@@ -573,13 +633,13 @@ body {
         border-radius: 6px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
-    .loupan-vr-btn {
+    .loupan-extra-btns {
         bottom: 52px;
         right: 16px;
     }
-    .loupan-marker .marker-text {
+    .community-label-3d .label-text {
         font-size: 10px;
-        max-width: 100px;
+        max-width: 140px;
     }
     .facility-label-3d .facility-text {
         font-size: 8px;
@@ -650,13 +710,13 @@ body {
         padding: 5px 12px;
         font-size: 11px;
     }
-    .loupan-vr-btn {
+    .loupan-extra-btns {
         bottom: 46px;
         right: 12px;
     }
-    .loupan-marker .marker-text {
+    .community-label-3d .label-text {
         font-size: 9px;
-        max-width: 88px;
+        max-width: 120px;
     }
     .facility-label-3d .facility-text {
         font-size: 7px;
@@ -719,7 +779,7 @@ body {
     #close-district-btn {
         bottom: 50px;
     }
-    .loupan-vr-btn {
+    .loupan-extra-btns {
         bottom: 16px;
     }
     .filter-panel {
