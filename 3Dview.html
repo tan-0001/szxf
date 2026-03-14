@@ -81,18 +81,18 @@
         // 确保所有依赖都加载完成后再初始化
         function checkDependencies() {
             if (typeof THREE === 'undefined' || 
-                typeof Line2 === 'undefined' || 
-                typeof LineGeometry === 'undefined' || 
-                typeof LineMaterial === 'undefined' || 
-                typeof THREE.CSS2DObject === 'undefined' ||  // 添加CSS2DObject检查
+                typeof THREE.Line2 === 'undefined' || 
+                typeof THREE.LineGeometry === 'undefined' || 
+                typeof THREE.LineMaterial === 'undefined' || 
+                typeof THREE.CSS2DObject === 'undefined' || 
                 typeof AMap === 'undefined') {
                 setTimeout(checkDependencies, 100);
                 return;
             }
             
-            // 所有依赖都已加载，初始化地图
-            if (typeof initMap === 'function') {
-                initMap();
+            // 所有依赖都已加载，根据 URL 参数 community 加载项目并定位到对应小区
+            if (typeof start3DView === 'function') {
+                start3DView();
             }
         }
         
@@ -104,20 +104,64 @@
     <!-- 地图容器 -->
     <div id="map"></div>
 
-    <!-- 动画Logo水印 - 单个W型移动 -->
+    <!-- 左侧户型筛选：竖排入口 + 筛选面板 -->
+    <div id="unit-filter-trigger" class="unit-filter-trigger no-select" title="户型筛选">
+        <span class="unit-filter-trigger-text">户型筛选</span>
+    </div>
+    <div id="unit-filter-panel" class="unit-filter-panel">
+        <div class="unit-filter-panel-head">
+            <span class="unit-filter-panel-title">户型筛选</span>
+            <button type="button" class="unit-filter-full-reset" id="unit-filter-full-reset" title="重置所有筛选条件与已选户型">重置筛选</button>
+            <button type="button" class="unit-filter-close" id="unit-filter-close" title="关闭">&times;</button>
+        </div>
+        <div class="unit-filter-options unit-filter-options-row">
+            <div class="unit-filter-section">
+                <div class="unit-filter-label">户型</div>
+                <div id="unit-filter-rooms" class="unit-filter-chks"></div>
+            </div>
+            <div class="unit-filter-section">
+                <div class="unit-filter-label">面积</div>
+                <div id="unit-filter-area" class="unit-filter-chks"></div>
+            </div>
+            <div class="unit-filter-section">
+                <div class="unit-filter-label">朝向</div>
+                <div id="unit-filter-orientation" class="unit-filter-chks"></div>
+            </div>
+        </div>
+        <div class="unit-filter-result-wrap">
+            <div class="unit-filter-result-header">
+                <span class="unit-filter-result-label">筛选结果</span>
+                <button type="button" class="unit-filter-result-reset" id="unit-filter-result-reset" title="清空已选户型">清空已选</button>
+            </div>
+            <div id="unit-filter-result-list" class="unit-filter-result-list"></div>
+        </div>
+    </div>
+
+    <!-- 配套筛选框（顶部居中，与 loupan 一致，默认显示小学、中学、地铁、商业） -->
+    <div id="filter-panel" class="filter-panel no-select">
+        <label class="filter-item"><input type="checkbox" data-type="primary" checked> 小学</label>
+        <label class="filter-item"><input type="checkbox" data-type="middle" checked> 中学</label>
+        <label class="filter-item"><input type="checkbox" data-type="subway" checked> 地铁</label>
+        <label class="filter-item"><input type="checkbox" data-type="commerce" checked> 商业</label>
+        <label class="filter-item"><input type="checkbox" data-type="park"> 公园</label>
+        <label class="filter-item"><input type="checkbox" data-type="hospital"> 医院</label>
+        <label class="filter-item"><input type="checkbox" data-type="municipal"> 政府</label>
+    </div>
+
+    <!-- Logo 水印：入场淡入+轻微浮动与光晕 -->
     <div class="logo-watermark" id="logo-single">
         <img src="logo.png" alt="臻选家">
     </div>
 
-    <!-- 画笔工具栏 -->
+    <!-- 画笔工具栏（与 loupan 一致大小） -->
     <div id="draw-toolbar">
         <div class="toolbar-buttons">
-            <button id="start-draw">开启绘图</button>
-            <button id="clear-draw">清除绘图</button>
+            <button id="start-draw" class="no-select">开启绘图</button>
+            <button id="clear-draw" class="no-select">清除绘图</button>
         </div>
         
         <!-- 颜色选择面板 -->
-        <div id="color-panel" class="color-panel hidden">
+        <div id="color-panel" class="color-panel hidden no-select">
             <div class="color-option selected" data-color="#285FF5" style="background-color: #285FF5;" title="蓝色"></div>
             <div class="color-option" data-color="#FF0000" style="background-color: #FF0000;" title="红色"></div>
             <div class="color-option" data-color="#00FF00" style="background-color: #00FF00;" title="绿色"></div>
@@ -131,30 +175,26 @@
     <!-- Canvas 绘图层 -->
     <canvas id="draw-canvas"></canvas>
 
-    <!-- 户型图查看器 -->
+    <!-- 户型图查看器：图片直接显示，户型信息框在屏幕下方居中 -->
     <div id="unit-image-viewer" class="unit-image-viewer">
         <div class="viewer-overlay"></div>
-        <div class="viewer-container">
-            <div class="viewer-header">
-                <div class="viewer-title">
-                    <span id="viewer-unit-name"></span>
-                    <span id="viewer-unit-info"></span>
-                </div>
-                <button class="viewer-close" id="viewer-close">&times;</button>
+        <div class="viewer-image-area" id="viewer-image-area">
+            <div class="viewer-image-wrap" id="viewer-image-wrap">
+                <img id="viewer-current-image" src="" alt="户型图">
+                <canvas id="viewer-draw-canvas" class="viewer-draw-canvas"></canvas>
             </div>
-            <div class="viewer-content">
-                <div class="image-container">
-                    <img id="viewer-current-image" src="" alt="户型图">
-                    <canvas id="viewer-draw-canvas" class="viewer-draw-canvas"></canvas>
-                    <div class="image-nav">
-                        <button class="nav-btn prev-btn" id="prev-image">&lt;</button>
-                        <button class="nav-btn next-btn" id="next-image">&gt;</button>
-                    </div>
-                    <div class="image-counter">
-                        <span id="current-index">1</span> / <span id="total-count">1</span>
-                    </div>
-                </div>
+            <div class="image-nav">
+                <button class="nav-btn prev-btn" id="prev-image">&lt;</button>
+                <button class="nav-btn next-btn" id="next-image">&gt;</button>
             </div>
+            <div class="image-counter">
+                <span id="current-index">1</span> / <span id="total-count">1</span>
+            </div>
+        </div>
+        <div class="viewer-info-bar">
+            <span id="viewer-unit-name"></span>
+            <button class="viewer-rotate-btn" id="viewer-rotate-btn" type="button" title="向右旋转">↻</button>
+            <button class="viewer-close" id="viewer-close" type="button">&times;</button>
         </div>
     </div>
 </body>
